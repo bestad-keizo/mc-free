@@ -21,7 +21,7 @@
     opacity: 0; animation: fadeUp 0.8s ease-out 0.2s forwards;
   }
   #splash .logo-sub {
-    font-family: 'Helvetica Neue', sans-serif;
+    font-family: "Helvetica Neue", sans-serif;
     font-size: 12px; color: #f97316; letter-spacing: 3px;
     opacity: 0; animation: fadeUp 0.8s ease-out 0.5s forwards;
   }
@@ -31,7 +31,7 @@
     opacity: 0; animation: fadeUp 0.6s ease-out 0.7s forwards;
   }
   #splash .bar-fill {
-    width: 0%%; height: 100%%; background: linear-gradient(90deg, #f97316, #4F8EF7);
+    width: 0%; height: 100%; background: linear-gradient(90deg, #f97316, #4F8EF7);
     border-radius: 2px; animation: loading 1.2s ease-in-out 0.8s forwards;
   }
   @keyframes fadeUp {
@@ -39,9 +39,9 @@
     to { opacity: 1; transform: translateY(0); }
   }
   @keyframes loading {
-    0%% { width: 0%%; }
-    60%% { width: 85%%; }
-    100%% { width: 100%%; }
+    0% { width: 0%; }
+    60% { width: 85%; }
+    100% { width: 100%; }
   }
 </style>
 <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
@@ -56,11 +56,11 @@
 <div id="root"></div>
 <script src="app-free.js"></script>
 <script>
-var root = ReactDOM.createRoot(document.getElementById('root'));
+var root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(React.createElement(App));
 setTimeout(function(){
-  var s = document.getElementById('splash');
-  if(s){ s.classList.add('hide'); setTimeout(function(){ s.remove(); }, 700); }
+  var s = document.getElementById("splash");
+  if(s){ s.classList.add("hide"); setTimeout(function(){ s.remove(); }, 700); }
 }, 2200);
 </script>
 </body>
