@@ -651,20 +651,24 @@ function ScreenAreaEditor({
     }
   }, "\uD83D\uDCD0 \u753B\u9762\u9818\u57DF\uFF08\u30C9\u30E9\u30C3\u30B0\u3067\u8ABF\u6574\uFF09"), /*#__PURE__*/React.createElement("div", {
     style: {
+      padding: "8px 0"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
       position: "relative",
       width: item.frameW * ps,
       height: item.frameH * ps,
       margin: "0 auto",
       background: "#222",
-      borderRadius: 8,
-      overflow: "hidden"
+      borderRadius: 8
     }
   }, item.frameUrl && /*#__PURE__*/React.createElement("img", {
     src: item.frameUrl,
     style: {
       width: "100%",
       height: "100%",
-      opacity: 0.6
+      opacity: 0.6,
+      borderRadius: 8
     },
     alt: ""
   }), /*#__PURE__*/React.createElement("div", {
@@ -822,7 +826,7 @@ function ScreenAreaEditor({
       borderRadius: 2,
       cursor: "nwse-resize"
     }
-  }))), /*#__PURE__*/React.createElement("div", {
+  })))), /*#__PURE__*/React.createElement("div", {
     style: {
       display: "grid",
       gridTemplateColumns: "1fr 1fr 1fr 1fr",
