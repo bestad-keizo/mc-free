@@ -592,22 +592,16 @@ function ScreenAreaEditor({
       if (dragging.current === "move") onUpdate(item.id, {
         screenX: Math.round(s.sx + dx),
         screenY: Math.round(s.sy + dy)
-      });else if (dragging.current === "resize-br") onUpdate(item.id, {
-        screenW: Math.max(20, Math.round(s.sw + dx)),
-        screenH: Math.max(20, Math.round(s.sh + dy))
-      });else if (dragging.current === "resize-tl") onUpdate(item.id, {
-        screenX: Math.round(s.sx + dx),
+      });else if (dragging.current === "edge-top") onUpdate(item.id, {
         screenY: Math.round(s.sy + dy),
-        screenW: Math.max(20, Math.round(s.sw - dx)),
         screenH: Math.max(20, Math.round(s.sh - dy))
-      });else if (dragging.current === "resize-tr") onUpdate(item.id, {
-        screenY: Math.round(s.sy + dy),
-        screenW: Math.max(20, Math.round(s.sw + dx)),
-        screenH: Math.max(20, Math.round(s.sh - dy))
-      });else if (dragging.current === "resize-bl") onUpdate(item.id, {
-        screenX: Math.round(s.sx + dx),
-        screenW: Math.max(20, Math.round(s.sw - dx)),
+      });else if (dragging.current === "edge-bottom") onUpdate(item.id, {
         screenH: Math.max(20, Math.round(s.sh + dy))
+      });else if (dragging.current === "edge-left") onUpdate(item.id, {
+        screenX: Math.round(s.sx + dx),
+        screenW: Math.max(20, Math.round(s.sw - dx))
+      });else if (dragging.current === "edge-right") onUpdate(item.id, {
+        screenW: Math.max(20, Math.round(s.sw + dx))
       });else if (dragging.current === "spine-move") onUpdate(item.id, {
         spineX: Math.round(s.spx + dx),
         spineY: Math.round(s.spy + dy)
@@ -679,52 +673,56 @@ function ScreenAreaEditor({
       color: "#f97316"
     }
   }, "\u8868\u7D19"), /*#__PURE__*/React.createElement("div", {
-    onMouseDown: e => onDown(e, "resize-tl"),
+    onMouseDown: e => onDown(e, "edge-top"),
     style: {
       position: "absolute",
       top: -5,
-      left: -5,
-      width: 10,
-      height: 10,
+      left: "50%",
+      transform: "translateX(-50%)",
+      width: 20,
+      height: 8,
       background: "#f97316",
       borderRadius: 2,
-      cursor: "nwse-resize"
+      cursor: "ns-resize"
     }
   }), /*#__PURE__*/React.createElement("div", {
-    onMouseDown: e => onDown(e, "resize-tr"),
-    style: {
-      position: "absolute",
-      top: -5,
-      right: -5,
-      width: 10,
-      height: 10,
-      background: "#f97316",
-      borderRadius: 2,
-      cursor: "nesw-resize"
-    }
-  }), /*#__PURE__*/React.createElement("div", {
-    onMouseDown: e => onDown(e, "resize-bl"),
+    onMouseDown: e => onDown(e, "edge-bottom"),
     style: {
       position: "absolute",
       bottom: -5,
-      left: -5,
-      width: 10,
-      height: 10,
+      left: "50%",
+      transform: "translateX(-50%)",
+      width: 20,
+      height: 8,
       background: "#f97316",
       borderRadius: 2,
-      cursor: "nesw-resize"
+      cursor: "ns-resize"
     }
   }), /*#__PURE__*/React.createElement("div", {
-    onMouseDown: e => onDown(e, "resize-br"),
+    onMouseDown: e => onDown(e, "edge-left"),
     style: {
       position: "absolute",
-      bottom: -5,
-      right: -5,
-      width: 10,
-      height: 10,
+      left: -5,
+      top: "50%",
+      transform: "translateY(-50%)",
+      width: 8,
+      height: 20,
       background: "#f97316",
       borderRadius: 2,
-      cursor: "nwse-resize"
+      cursor: "ew-resize"
+    }
+  }), /*#__PURE__*/React.createElement("div", {
+    onMouseDown: e => onDown(e, "edge-right"),
+    style: {
+      position: "absolute",
+      right: -5,
+      top: "50%",
+      transform: "translateY(-50%)",
+      width: 8,
+      height: 20,
+      background: "#f97316",
+      borderRadius: 2,
+      cursor: "ew-resize"
     }
   })), hasSpine && /*#__PURE__*/React.createElement("div", {
     onMouseDown: e => onDown(e, "spine-move"),
