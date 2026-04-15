@@ -588,18 +588,32 @@ function ScreenAreaEditor({
     const onMove = ev => {
       const dx = (ev.clientX - startPos.current.mx) / ps,
         dy = (ev.clientY - startPos.current.my) / ps;
+      const s = startPos.current;
       if (dragging.current === "move") onUpdate(item.id, {
-        screenX: Math.round(startPos.current.sx + dx),
-        screenY: Math.round(startPos.current.sy + dy)
-      });else if (dragging.current === "resize") onUpdate(item.id, {
-        screenW: Math.max(20, Math.round(startPos.current.sw + dx)),
-        screenH: Math.max(20, Math.round(startPos.current.sh + dy))
+        screenX: Math.round(s.sx + dx),
+        screenY: Math.round(s.sy + dy)
+      });else if (dragging.current === "resize-br") onUpdate(item.id, {
+        screenW: Math.max(20, Math.round(s.sw + dx)),
+        screenH: Math.max(20, Math.round(s.sh + dy))
+      });else if (dragging.current === "resize-tl") onUpdate(item.id, {
+        screenX: Math.round(s.sx + dx),
+        screenY: Math.round(s.sy + dy),
+        screenW: Math.max(20, Math.round(s.sw - dx)),
+        screenH: Math.max(20, Math.round(s.sh - dy))
+      });else if (dragging.current === "resize-tr") onUpdate(item.id, {
+        screenY: Math.round(s.sy + dy),
+        screenW: Math.max(20, Math.round(s.sw + dx)),
+        screenH: Math.max(20, Math.round(s.sh - dy))
+      });else if (dragging.current === "resize-bl") onUpdate(item.id, {
+        screenX: Math.round(s.sx + dx),
+        screenW: Math.max(20, Math.round(s.sw - dx)),
+        screenH: Math.max(20, Math.round(s.sh + dy))
       });else if (dragging.current === "spine-move") onUpdate(item.id, {
-        spineX: Math.round(startPos.current.spx + dx),
-        spineY: Math.round(startPos.current.spy + dy)
+        spineX: Math.round(s.spx + dx),
+        spineY: Math.round(s.spy + dy)
       });else if (dragging.current === "spine-resize") onUpdate(item.id, {
-        spineW: Math.max(5, Math.round(startPos.current.spw + dx)),
-        spineH: Math.max(20, Math.round(startPos.current.sph + dy))
+        spineW: Math.max(5, Math.round(s.spw + dx)),
+        spineH: Math.max(20, Math.round(s.sph + dy))
       });
     };
     const onUp = () => {
@@ -665,11 +679,47 @@ function ScreenAreaEditor({
       color: "#f97316"
     }
   }, "\u8868\u7D19"), /*#__PURE__*/React.createElement("div", {
-    onMouseDown: e => onDown(e, "resize"),
+    onMouseDown: e => onDown(e, "resize-tl"),
     style: {
       position: "absolute",
-      bottom: -4,
-      right: -4,
+      top: -5,
+      left: -5,
+      width: 10,
+      height: 10,
+      background: "#f97316",
+      borderRadius: 2,
+      cursor: "nwse-resize"
+    }
+  }), /*#__PURE__*/React.createElement("div", {
+    onMouseDown: e => onDown(e, "resize-tr"),
+    style: {
+      position: "absolute",
+      top: -5,
+      right: -5,
+      width: 10,
+      height: 10,
+      background: "#f97316",
+      borderRadius: 2,
+      cursor: "nesw-resize"
+    }
+  }), /*#__PURE__*/React.createElement("div", {
+    onMouseDown: e => onDown(e, "resize-bl"),
+    style: {
+      position: "absolute",
+      bottom: -5,
+      left: -5,
+      width: 10,
+      height: 10,
+      background: "#f97316",
+      borderRadius: 2,
+      cursor: "nesw-resize"
+    }
+  }), /*#__PURE__*/React.createElement("div", {
+    onMouseDown: e => onDown(e, "resize-br"),
+    style: {
+      position: "absolute",
+      bottom: -5,
+      right: -5,
       width: 10,
       height: 10,
       background: "#f97316",
