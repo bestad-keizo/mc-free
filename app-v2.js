@@ -4500,7 +4500,25 @@ function App() {
       gap: 4,
       alignItems: "center"
     }
-  }, /*#__PURE__*/React.createElement("div", {
+  }, items.length > 0 && /*#__PURE__*/React.createElement("button", {
+    onClick: function () {
+      if (confirm("全パーツを削除しますか？")) {
+        setItems([]);
+        setSelected(null);
+      }
+    },
+    style: {
+      fontSize: 11,
+      color: "#ef4444",
+      background: "none",
+      border: "1px solid #ef4444",
+      borderRadius: 5,
+      padding: "4px 8px",
+      cursor: "pointer",
+      fontFamily: "inherit",
+      fontWeight: 600
+    }
+  }, "\u30EA\u30BB\u30C3\u30C8"), /*#__PURE__*/React.createElement("div", {
     style: {
       position: "relative"
     }
