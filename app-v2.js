@@ -592,6 +592,22 @@ function ScreenAreaEditor({
       if (dragging.current === "move") onUpdate(item.id, {
         screenX: Math.round(s.sx + dx),
         screenY: Math.round(s.sy + dy)
+      });else if (dragging.current === "corner-tl") onUpdate(item.id, {
+        screenX: Math.round(s.sx + dx),
+        screenY: Math.round(s.sy + dy),
+        screenW: Math.max(20, Math.round(s.sw - dx)),
+        screenH: Math.max(20, Math.round(s.sh - dy))
+      });else if (dragging.current === "corner-tr") onUpdate(item.id, {
+        screenY: Math.round(s.sy + dy),
+        screenW: Math.max(20, Math.round(s.sw + dx)),
+        screenH: Math.max(20, Math.round(s.sh - dy))
+      });else if (dragging.current === "corner-bl") onUpdate(item.id, {
+        screenX: Math.round(s.sx + dx),
+        screenW: Math.max(20, Math.round(s.sw - dx)),
+        screenH: Math.max(20, Math.round(s.sh + dy))
+      });else if (dragging.current === "corner-br") onUpdate(item.id, {
+        screenW: Math.max(20, Math.round(s.sw + dx)),
+        screenH: Math.max(20, Math.round(s.sh + dy))
       });else if (dragging.current === "edge-top") onUpdate(item.id, {
         screenY: Math.round(s.sy + dy),
         screenH: Math.max(20, Math.round(s.sh - dy))
@@ -673,55 +689,103 @@ function ScreenAreaEditor({
       color: "#f97316"
     }
   }, "\u8868\u7D19"), /*#__PURE__*/React.createElement("div", {
-    onMouseDown: e => onDown(e, "edge-top"),
+    onMouseDown: e => onDown(e, "corner-tl"),
     style: {
       position: "absolute",
       top: -5,
-      left: "50%",
-      transform: "translateX(-50%)",
-      width: 20,
-      height: 8,
+      left: -5,
+      width: 10,
+      height: 10,
       background: "#f97316",
       borderRadius: 2,
+      cursor: "nwse-resize"
+    }
+  }), /*#__PURE__*/React.createElement("div", {
+    onMouseDown: e => onDown(e, "corner-tr"),
+    style: {
+      position: "absolute",
+      top: -5,
+      right: -5,
+      width: 10,
+      height: 10,
+      background: "#f97316",
+      borderRadius: 2,
+      cursor: "nesw-resize"
+    }
+  }), /*#__PURE__*/React.createElement("div", {
+    onMouseDown: e => onDown(e, "corner-bl"),
+    style: {
+      position: "absolute",
+      bottom: -5,
+      left: -5,
+      width: 10,
+      height: 10,
+      background: "#f97316",
+      borderRadius: 2,
+      cursor: "nesw-resize"
+    }
+  }), /*#__PURE__*/React.createElement("div", {
+    onMouseDown: e => onDown(e, "corner-br"),
+    style: {
+      position: "absolute",
+      bottom: -5,
+      right: -5,
+      width: 10,
+      height: 10,
+      background: "#f97316",
+      borderRadius: 2,
+      cursor: "nwse-resize"
+    }
+  }), /*#__PURE__*/React.createElement("div", {
+    onMouseDown: e => onDown(e, "edge-top"),
+    style: {
+      position: "absolute",
+      top: -4,
+      left: "50%",
+      transform: "translateX(-50%)",
+      width: 16,
+      height: 6,
+      background: "#fb923c",
+      borderRadius: 1,
       cursor: "ns-resize"
     }
   }), /*#__PURE__*/React.createElement("div", {
     onMouseDown: e => onDown(e, "edge-bottom"),
     style: {
       position: "absolute",
-      bottom: -5,
+      bottom: -4,
       left: "50%",
       transform: "translateX(-50%)",
-      width: 20,
-      height: 8,
-      background: "#f97316",
-      borderRadius: 2,
+      width: 16,
+      height: 6,
+      background: "#fb923c",
+      borderRadius: 1,
       cursor: "ns-resize"
     }
   }), /*#__PURE__*/React.createElement("div", {
     onMouseDown: e => onDown(e, "edge-left"),
     style: {
       position: "absolute",
-      left: -5,
+      left: -4,
       top: "50%",
       transform: "translateY(-50%)",
-      width: 8,
-      height: 20,
-      background: "#f97316",
-      borderRadius: 2,
+      width: 6,
+      height: 16,
+      background: "#fb923c",
+      borderRadius: 1,
       cursor: "ew-resize"
     }
   }), /*#__PURE__*/React.createElement("div", {
     onMouseDown: e => onDown(e, "edge-right"),
     style: {
       position: "absolute",
-      right: -5,
+      right: -4,
       top: "50%",
       transform: "translateY(-50%)",
-      width: 8,
-      height: 20,
-      background: "#f97316",
-      borderRadius: 2,
+      width: 6,
+      height: 16,
+      background: "#fb923c",
+      borderRadius: 1,
       cursor: "ew-resize"
     }
   })), hasSpine && /*#__PURE__*/React.createElement("div", {
