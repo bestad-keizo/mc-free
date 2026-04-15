@@ -3,239 +3,271 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mockup Composer 完全ガイド</title>
+<title>Mockup Composer ガイド</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap');
-:root{--bg:#0a0e17;--bg2:#0f1420;--bg3:#141c28;--border:rgba(255,255,255,.08);--border2:rgba(255,255,255,.12);--orange:#f97316;--green:#22c55e;--blue:#4F8EF7;--purple:#9B7EF8;--teal:#35C9A0;--text:#e4e4e7;--text2:#a0a8b8;--text3:#555f70}
-*{box-sizing:border-box;margin:0;padding:0}
-html{background:var(--bg)}
-body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);line-height:1.8;font-size:15px}
-.wrap{max-width:780px;margin:0 auto;padding:32px 24px 80px}
-.logo-area{text-align:center;padding:48px 0 20px}
-.logo-mark{display:inline-flex;align-items:center;justify-content:center;width:64px;height:64px;border-radius:16px;background:linear-gradient(135deg,#f97316,#ea580c);font-size:28px;font-weight:900;color:#fff;margin-bottom:12px;box-shadow:0 8px 24px rgba(249,115,22,.3)}
-.logo-title{font-size:28px;font-weight:900;color:#fff;margin-bottom:4px}
-.logo-sub{font-size:13px;color:var(--text3)}
-.nav{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin:24px 0 40px;padding:16px;background:var(--bg2);border-radius:12px;border:1px solid var(--border)}
-.nav a{font-size:12px;color:var(--text2);text-decoration:none;padding:6px 12px;border-radius:6px;border:1px solid var(--border);transition:all .2s}
-.nav a:hover{border-color:var(--orange);color:var(--orange)}
-h2{font-size:22px;font-weight:900;color:var(--orange);margin:48px 0 16px;padding-bottom:10px;border-bottom:2px solid rgba(249,115,22,.2)}
-h3{font-size:16px;font-weight:700;color:var(--text);margin:28px 0 10px}
-p{margin-bottom:14px;color:var(--text2)}
-.card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px}
-.card-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:8px}
-.step{display:flex;gap:14px;margin-bottom:18px;align-items:flex-start}
-.step-num{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--orange),#ea580c);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;color:#fff;flex-shrink:0}
-.step-num.green{background:linear-gradient(135deg,var(--teal),#0F6E56)}
-.step-num.blue{background:linear-gradient(135deg,var(--blue),#3b6fd4)}
-.step-num.purple{background:linear-gradient(135deg,var(--purple),#7c5cd6)}
-.step-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:2px}
-.step-desc{font-size:13px;color:var(--text2);line-height:1.8}
-.alert{padding:14px 18px;border-radius:10px;margin-bottom:16px;font-size:13px;line-height:1.8}
-.alert-info{background:rgba(79,142,247,.06);border:1px solid rgba(79,142,247,.15);color:var(--blue)}
-.alert-warn{background:rgba(249,115,22,.06);border:1px solid rgba(249,115,22,.15);color:var(--orange)}
-.alert-ok{background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.15);color:var(--green)}
-table{width:100%;border-collapse:collapse;margin-bottom:16px;font-size:13px}
-th{background:var(--bg3);color:var(--orange);padding:10px 14px;text-align:left;font-weight:700;border:1px solid var(--border2)}
-td{padding:10px 14px;border:1px solid var(--border);color:var(--text2)}
-.frame-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:16px}
-.frame-item{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center;font-size:12px;color:var(--text2)}
-.frame-icon{font-size:28px;margin-bottom:6px}
-.frame-name{font-weight:700;color:var(--text);margin-bottom:2px}
-.divider{border:none;border-top:1px solid var(--border);margin:40px 0}
-.faq-q{font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px}
-.faq-a{font-size:13px;color:var(--text2);margin-bottom:20px;line-height:1.8}
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;600;800&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0a0e17;color:#c8cdd5;font-family:'Noto Sans JP',sans-serif;font-size:15px;line-height:1.8}
+a{color:#f97316;text-decoration:none}
+a:hover{text-decoration:underline}
+
+.wrap{max-width:820px;margin:0 auto;padding:24px 20px 80px}
+
+/* Header */
+.hero{text-align:center;padding:48px 0 40px;border-bottom:1px solid #1e2535;margin-bottom:40px}
+.hero img{height:56px;margin-bottom:16px}
+.hero h1{font-size:26px;font-weight:800;color:#fff;margin-bottom:8px}
+.hero p{color:#94a3b8;font-size:14px}
+
+/* Section */
+h2{font-size:20px;font-weight:800;color:#fff;margin:48px 0 16px;padding-bottom:8px;border-bottom:2px solid #f97316}
+h3{font-size:16px;font-weight:700;color:#f97316;margin:28px 0 10px}
+p{margin-bottom:14px}
+
+/* Steps */
+.steps{display:flex;flex-direction:column;gap:16px;margin:20px 0}
+.step{display:flex;gap:14px;align-items:flex-start;background:#111827;border-radius:12px;padding:16px;border:1px solid #1e2535}
+.step-num{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:16px;color:#fff;flex-shrink:0}
+.step:nth-child(1) .step-num{background:#f97316}
+.step:nth-child(2) .step-num{background:#3b82f6}
+.step:nth-child(3) .step-num{background:#22c55e}
+.step-body h4{font-size:14px;font-weight:700;color:#fff;margin-bottom:4px}
+.step-body p{font-size:13px;color:#94a3b8;margin-bottom:0}
+
+/* Table */
+.tbl-wrap{overflow-x:auto;margin:16px 0 24px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{background:#1e2535;color:#f97316;font-weight:700;padding:10px 12px;text-align:left;position:sticky;top:0}
+td{padding:9px 12px;border-bottom:1px solid #1a1f2e}
+tr:hover td{background:rgba(249,115,22,.04)}
+.cat-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600}
+.cat-device{background:#1e3a5f;color:#60a5fa}
+.cat-box{background:#3b2e1a;color:#fbbf24}
+.cat-doc{background:#1a2e1a;color:#86efac}
+.cat-check{background:#2e1a2e;color:#c084fc}
+.cat-media{background:#1a2e3b;color:#67e8f9}
+.cat-cert{background:#3b1a1a;color:#fca5a5}
+.cat-deco{background:#2e2e1a;color:#fde68a}
+
+/* Feature box */
+.feature{background:#111827;border-radius:14px;padding:20px;border:1px solid #1e2535;margin:16px 0}
+.feature-title{font-size:15px;font-weight:700;color:#fff;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.feature-title span{font-size:20px}
+
+/* Tip */
+.tip{background:#1a1a0a;border-left:4px solid #f97316;padding:12px 16px;border-radius:0 8px 8px 0;margin:16px 0;font-size:13px;color:#e0c080}
+
+/* Footer */
+.footer{text-align:center;padding:40px 0 20px;border-top:1px solid #1e2535;margin-top:48px;font-size:12px;color:#555}
+
+/* Responsive */
+@media(max-width:600px){
+  .hero h1{font-size:22px}
+  h2{font-size:18px}
+  table{font-size:11px}
+  th,td{padding:7px 8px}
+}
 </style>
 </head>
 <body>
 <div class="wrap">
 
-<div class="logo-area">
-  <div class="logo-mark">MC</div>
-  <div class="logo-title">Mockup Composer</div>
-  <div class="logo-sub">完全ガイド — プロ品質の3Dモックアップを誰でも無料で</div>
+<!-- HERO -->
+<div class="hero">
+  <img src="https://bestad-keizo.github.io/mc-free/frames/mc-logo.png" alt="Mockup Composer">
+  <h1>Mockup Composer ガイド</h1>
+  <p>プロ品質の3Dモックアップを、ブラウザだけで無料作成</p>
 </div>
 
-<div class="nav">
-  <a href="#about">ツール概要</a>
-  <a href="#start">はじめ方</a>
-  <a href="#frame">フレームを選ぶ</a>
-  <a href="#image">画像を入れる</a>
-  <a href="#3d">3D回転・影</a>
-  <a href="#export">書き出し</a>
-  <a href="#register">メール登録</a>
-  <a href="#share">透かしを消す</a>
-  <a href="#lp-tool">素材生成ツール</a>
-  <a href="#lp-edit">編集画面</a>
-  <a href="#lp-prompt">プロンプト生成</a>
-  <a href="#canva">Canvaでの使い方</a>
-  <a href="#faq">よくある質問</a>
+<!-- ===== 概要 ===== -->
+<h2>Mockup Composerとは？</h2>
+<p>Mockup Composerは、コーチ・コンサルタント・セラピスト・先生業の方が、<strong>セールスページやSNSで使えるプロ品質のモックアップ画像</strong>を簡単に作れる無料ツールです。</p>
+<p>iMac、MacBook、iPhone、3Dボックス、E-Bookなど<strong>30種類のフレーム</strong>を内蔵。デザインスキル不要で、あなたの教材やサービスを魅力的に見せる画像が3分で完成します。</p>
+
+<!-- ===== 基本の3ステップ ===== -->
+<h2>基本の3ステップ</h2>
+<div class="steps">
+  <div class="step">
+    <div class="step-num">1</div>
+    <div class="step-body">
+      <h4>フレームを選ぶ</h4>
+      <p>7カテゴリから目的に合ったフレームを選択。デバイス、ボックス、ドキュメント、チェックリスト、書籍・メディア、認定証、デコレーションから選べます。</p>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-num">2</div>
+    <div class="step-body">
+      <h4>画像をセット＋領域を調整</h4>
+      <p>コンテンツ画像をアップロードし、4点ドラッグで画面領域をフレームにピッタリ合わせます。斜めのiPhoneやパースのかかったE-Bookにも正確にフィットできます。</p>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-num">3</div>
+    <div class="step-body">
+      <h4>3D調整 → Export</h4>
+      <p>回転・スケール・影を調整し、PNG/JPEG/WebPでエクスポート。72/96/300dpiから選択可能です。</p>
+    </div>
+  </div>
 </div>
 
-<h2 id="about">Mockup Composerとは</h2>
-<p>あなたのオンライン講座やPDF教材を、<strong style="color:#fff">プロが作ったように見せる</strong>ための無料ツールです。</p>
-<p>フレーム画像（iMac、MacBook、iPad、iPhoneなど）にあなたの教材やコースの画面を合成し、3D回転・影をつけて書き出します。デザインスキルは一切不要です。</p>
-<div class="card">
-  <div class="card-title">🎯 このツールでできること</div>
-  <table>
-    <tr><th>機能</th><th>説明</th></tr>
-    <tr><td>12種類のフレーム</td><td>iMac、MacBook、iPad、iPhone、E-Book、CDケース、DVDケース、チェックリスト、3Dボックス、修了証書、ノート、iPhone横</td></tr>
-    <tr><td>3D回転</td><td>X軸・Y軸・Z軸のスライダーで自由に角度調整</td></tr>
-    <tr><td>影の追加</td><td>ドロップシャドウの強さ・色を調整</td></tr>
-    <tr><td>複数パーツ配置</td><td>MacBook＋iPhoneを並べるなど、複数を1枚に</td></tr>
-    <tr><td>PNG / JPEG / WebP</td><td>72 / 96 / 300 DPIで書き出し</td></tr>
-    <tr><td>素材生成ツール</td><td>LPのスクリーンショットからCanva用プロンプトを自動生成</td></tr>
-  </table>
-</div>
-<div class="alert alert-info">💡 料金はゼロ円です。メール登録だけでExportが無制限になります。</div>
+<!-- ===== 4点フリードラッグ ===== -->
+<h2>4点フリードラッグ（新機能）</h2>
 
-<h2 id="start">はじめ方（3ステップで完了）</h2>
-<div class="step"><div class="step-num">1</div><div class="step-body"><div class="step-title">ブラウザでアクセス</div><div class="step-desc"><a href="https://www.funnelbuilding.club/mc-free" target="_blank" style="color:var(--blue)">funnelbuilding.club/mc-free</a> を開く。ダウンロード不要。</div></div></div>
-<div class="step"><div class="step-num">2</div><div class="step-body"><div class="step-title">フレームを選んで画像を入れる</div><div class="step-desc">左パネルでフレーム（例：MacBook）を選び、あなたの講座のスクリーンショットをドラッグ＆ドロップ。</div></div></div>
-<div class="step"><div class="step-num">3</div><div class="step-body"><div class="step-title">3D回転をつけてExport</div><div class="step-desc">スライダーで角度を調整し、右上の「Export」ボタンでPNGを書き出し。完了。</div></div></div>
-
-<h2 id="frame">STEP 1：フレームを選ぶ</h2>
-<p>左パネルの「フレーム選択」から使いたいデバイスを選びます。</p>
-<div class="frame-grid">
-  <div class="frame-item"><div class="frame-icon">🖥</div><div class="frame-name">iMac</div>デスクトップ表示</div>
-  <div class="frame-item"><div class="frame-icon">💻</div><div class="frame-name">MacBook</div>ノートPC表示</div>
-  <div class="frame-item"><div class="frame-icon">📱</div><div class="frame-name">iPad</div>タブレット表示</div>
-  <div class="frame-item"><div class="frame-icon">📲</div><div class="frame-name">iPhone</div>スマホ縦表示</div>
-  <div class="frame-item"><div class="frame-icon">📖</div><div class="frame-name">E-Book</div>PDF教材の立体表示</div>
-  <div class="frame-item"><div class="frame-icon">💿</div><div class="frame-name">CDケース</div>音声教材</div>
-  <div class="frame-item"><div class="frame-icon">📀</div><div class="frame-name">DVDケース</div>動画教材</div>
-  <div class="frame-item"><div class="frame-icon">✅</div><div class="frame-name">チェックリスト</div>ワークシート</div>
-  <div class="frame-item"><div class="frame-icon">📦</div><div class="frame-name">3Dボックス</div>講座パッケージ</div>
-  <div class="frame-item"><div class="frame-icon">🏆</div><div class="frame-name">修了証書</div>コース完了証</div>
-  <div class="frame-item"><div class="frame-icon">📓</div><div class="frame-name">ノート</div>テキスト教材</div>
-  <div class="frame-item"><div class="frame-icon">📱</div><div class="frame-name">iPhone横</div>動画視聴イメージ</div>
-</div>
-<div class="alert alert-ok">✅ フレームを選ぶとキャンバスに配置されます。複数のフレームを追加して並べることもできます。</div>
-
-<h2 id="image">STEP 2：画像を入れる</h2>
-<div class="step"><div class="step-num green">1</div><div class="step-body"><div class="step-title">コンテンツ画像をアップロード</div><div class="step-desc">左パネルの「コンテンツ画像」エリアに、講座のスクリーンショットやPDF表紙をドラッグ＆ドロップ。フレーム内に画像が表示されます。</div></div></div>
-<div class="step"><div class="step-num green">2</div><div class="step-body"><div class="step-title">画面領域を調整</div><div class="step-desc">オレンジ色の枠をドラッグして、画像がフレームの画面部分にぴったり収まるように調整します。枠の角をドラッグするとサイズ変更、中央をドラッグすると位置移動です。</div></div></div>
-<div class="alert alert-warn">⚠ 画像がフレームからはみ出す場合は、オレンジ枠のサイズ・位置を調整してください。</div>
-
-<h2 id="3d">STEP 3：3D回転・影をつける</h2>
-<p>左パネルの「3D回転・影」セクションでスライダーを動かします。</p>
-<div class="card">
-  <table>
-    <tr><th>パラメーター</th><th>効果</th><th>おすすめ値</th></tr>
-    <tr><td>X回転</td><td>上下方向の傾き</td><td>5〜15°</td></tr>
-    <tr><td>Y回転</td><td>左右方向の傾き</td><td>10〜25°</td></tr>
-    <tr><td>Z回転</td><td>時計回りの回転</td><td>0〜5°</td></tr>
-    <tr><td>影の強さ</td><td>ドロップシャドウの大きさ</td><td>10〜20</td></tr>
-  </table>
-</div>
-<div class="alert alert-info">💡 迷ったら「Y回転: 15°、影の強さ: 15」から始めてみてください。それだけでプロっぽくなります。</div>
-
-<h2 id="export">STEP 4：書き出し（Export）</h2>
-<div class="step"><div class="step-num blue">1</div><div class="step-body"><div class="step-title">右上の「Export ↓」ボタンをクリック</div><div class="step-desc">フォーマット（PNG / JPEG / WebP）とDPI（72 / 96 / 300）を選択します。Web用は96dpi推奨。</div></div></div>
-<div class="step"><div class="step-num blue">2</div><div class="step-body"><div class="step-title">「Export」ボタンを押す</div><div class="step-desc">画像がダウンロードされます。セールスページやSNSに貼り付けて使ってください。</div></div></div>
-<div class="card">
-  <div class="card-title">📐 推奨フォーマット</div>
-  <table>
-    <tr><th>用途</th><th>フォーマット</th><th>DPI</th></tr>
-    <tr><td>セールスページ・SNS</td><td>PNG（透過対応）</td><td>96dpi</td></tr>
-    <tr><td>高品質な印刷物</td><td>PNG</td><td>300dpi</td></tr>
-    <tr><td>ファイルサイズを軽くしたい</td><td>WebP</td><td>96dpi</td></tr>
-  </table>
+<div class="feature">
+  <div class="feature-title"><span>📐</span> 画面領域の自由変形</div>
+  <p>従来の矩形指定から<strong>4頂点の自由配置</strong>に進化しました。各頂点（TL/TR/BR/BL）を独立して自由な方向にドラッグできます。</p>
+  <p><strong>操作方法：</strong></p>
+  <p>🟠 <strong>丸ハンドル（4隅）</strong>→ 各頂点を自由にドラッグ（完全独立）<br>
+  🟠 <strong>フレーム内ドラッグ</strong>→ 4点全体を移動</p>
+  <p>内部ではCSS matrix3d変換により、台形・平行四辺形など自由な四角形に画像をワープ描画します。これにより、斜めに傾いたデバイスや3Dパースのかかったフレームにも正確に画像をはめ込めます。</p>
 </div>
 
-<h2 id="register">メール登録について</h2>
-<p>1回目のExportは登録なしで使えます。2回目のExportからメールアドレスの登録が必要です。</p>
-<div class="card">
-  <table>
-    <tr><th>状態</th><th>モックアップ作成</th><th>Export</th></tr>
-    <tr><td>メール登録前</td><td>✅ 無制限</td><td>🎁 初回無料</td></tr>
-    <tr><td>メール登録後</td><td>✅ 無制限</td><td>✅ 無制限</td></tr>
-  </table>
+<div class="tip">💡 ヒント：4点調整を使えば、「画像の変形」の傾きX/Y/奥行きスライダーを使わなくても、フレームに画像を正確にフィットできます。</div>
+
+<!-- ===== フレーム一覧 ===== -->
+<h2>フレーム一覧（7カテゴリ・30種）</h2>
+
+<h3>🖥 デバイス（7種）</h3>
+<p>オンライン講座・ウェビナー・LP・メンバーシップサイトの画面表示に。</p>
+<div class="tbl-wrap">
+<table>
+<tr><th>フレーム名</th><th>用途</th><th>画面比率</th><th>推奨Canvaサイズ</th></tr>
+<tr><td>iMac</td><td>メイン画面のモックアップ</td><td>16:9 横長</td><td>1920×1080</td></tr>
+<tr><td>iMac クラシック</td><td>シルバー筐体のクラシック版</td><td>16:9 横長</td><td>1920×1080</td></tr>
+<tr><td>MacBook</td><td>ノートPCでの表示イメージ</td><td>16:10 横長</td><td>1440×900</td></tr>
+<tr><td>iPad</td><td>タブレットでの閲覧イメージ</td><td>3:4 縦長</td><td>1080×1350</td></tr>
+<tr><td>iPhone</td><td>スマホ正面・LINE LP表示</td><td>9:16 縦長</td><td>1080×1920</td></tr>
+<tr><td>iPhone 斜め横</td><td>スマホ斜めアングル（動的）</td><td>ほぼ正方形</td><td>1080×1080</td></tr>
+<tr><td>iPhone 斜め縦</td><td>スマホ斜め縦アングル</td><td>9:16 超縦長</td><td>1080×1920</td></tr>
+</table>
 </div>
-<div class="alert alert-ok">✅ 登録は無料、30秒で完了します。配信停止はいつでも可能です。</div>
 
-<h2 id="share">ウォーターマーク（透かし）を消す方法</h2>
-<p>書き出した画像の右下に小さな「MC」マークが入っています。これを消すには、SNSでシェアしてください。</p>
-<div class="step"><div class="step-num purple">1</div><div class="step-body"><div class="step-title">メール登録を完了する</div><div class="step-desc">Exportが無制限になります（ウォーターマークはまだ残る）。</div></div></div>
-<div class="step"><div class="step-num purple">2</div><div class="step-body"><div class="step-title">SNSでシェアする</div><div class="step-desc">登録後に表示されるシェアボタン（Facebook / X / LINE）のいずれかをクリック。</div></div></div>
-<div class="step"><div class="step-num purple">3</div><div class="step-body"><div class="step-title">ウォーターマークが消える</div><div class="step-desc">以降のExportはクリーンな画像（透かしなし）になります。</div></div></div>
-<div class="alert alert-info">💡 シェアしなくてもツールは使い続けられます。ウォーターマーク付きの画像が書き出されるだけです。</div>
-
-<hr class="divider">
-
-<h2 id="lp-tool">素材生成ツール（LPプロンプト生成ツール）</h2>
-<p>右上の「<strong style="color:var(--teal)">素材生成ツール</strong>」ボタンで起動します。LPのスクリーンショットから配色を自動取得し、Canvaで使えるプロンプトを4サイズ分生成するツールです。</p>
-<div class="card">
-  <div class="card-title">🎨 生成される4サイズ</div>
-  <table>
-    <tr><th>サイズ</th><th>用途</th><th>Canva形式</th></tr>
-    <tr><td>1920×1080</td><td>iMac / MacBook用</td><td>プレゼンテーション</td></tr>
-    <tr><td>1080×1920</td><td>iPhone用</td><td>ストーリー</td></tr>
-    <tr><td>1200×1600</td><td>iPad / E-Book用</td><td>ポスター</td></tr>
-    <tr><td>1080×1080</td><td>Instagram / CD用</td><td>Instagramポスト</td></tr>
-  </table>
+<h3>📦 ボックス（4種）</h3>
+<p>教材パッケージ・プログラム・コース商品の「箱」演出。スタックスライドの知覚価値を最大化。</p>
+<div class="tbl-wrap">
+<table>
+<tr><th>フレーム名</th><th>用途</th><th>構成</th><th>推奨Canvaサイズ</th></tr>
+<tr><td>厚ボックス左</td><td>左側に背表紙が見える厚いボックス</td><td>表紙＋背表紙</td><td>600×900</td></tr>
+<tr><td>厚ボックス右</td><td>右側に背表紙が見える厚いボックス</td><td>表紙＋背表紙</td><td>600×900</td></tr>
+<tr><td>薄ボックス左</td><td>薄型ボックス左向き</td><td>表紙＋背表紙</td><td>600×900</td></tr>
+<tr><td>薄ボックス右</td><td>薄型ボックス右向き</td><td>表紙＋背表紙</td><td>600×900</td></tr>
+</table>
 </div>
-<h3>① アップロード画面</h3>
-<div class="step"><div class="step-num green">1</div><div class="step-body"><div class="step-title">LPのスクリーンショットをアップロード</div><div class="step-desc">参考にしたいLPのスクリーンショットをドラッグ＆ドロップ。複数枚OK。アップロードすると<strong style="color:var(--green)">配色が自動で取得</strong>されます。</div></div></div>
-<div class="step"><div class="step-num green">2</div><div class="step-body"><div class="step-title">LPテキストを貼り付け（任意）</div><div class="step-desc">LPのテキスト（キャッチコピーなど）をコピー＆ペースト。なくてもOK。</div></div></div>
-<div class="step"><div class="step-num green">3</div><div class="step-body"><div class="step-title">「② 編集へ進む」をクリック</div><div class="step-desc">自動取得された配色が反映された状態で編集画面に進みます。</div></div></div>
+<div class="tip">💡 ボックスフレームには「背表紙」の領域があります。表紙と同様に4点フリードラッグで調整できます。</div>
 
-<h2 id="lp-edit">素材生成ツール — 編集画面</h2>
-<p>配色はスクリーンショットから自動取得されます。残りの項目はドロップダウンから選ぶだけです。</p>
-<div class="card">
-  <div class="card-title">✏️ 入力項目（すべてドロップダウン選択）</div>
-  <table>
-    <tr><th>項目</th><th>操作</th><th>選択肢の例</th></tr>
-    <tr><td>配色（3色）</td><td>自動取得 / 手動変更可</td><td>背景色・アクセント色・テキスト色</td></tr>
-    <tr><td>雰囲気</td><td>ドロップダウン</td><td>プロフェッショナル / カジュアル / 高級 / エネルギッシュ / ミニマル / 温かみのある</td></tr>
-    <tr><td>ターゲット</td><td>ドロップダウン</td><td>コーチ / セラピスト / 先生 / 経営者 / 占い師 / 個人</td></tr>
-    <tr><td>ヘッドライン</td><td>自動生成（編集可）</td><td>雰囲気×ターゲットで英語テキスト自動生成</td></tr>
-    <tr><td>サブヘッドライン</td><td>自動生成（編集可）</td><td>雰囲気に基づいて自動生成</td></tr>
-    <tr><td>CTA</td><td>ドロップダウン</td><td>Get Started Now / Get It Free / Learn More 等</td></tr>
-    <tr><td>装飾スタイル</td><td>ドロップダウン</td><td>グラデーション / 幾何学 / 直線 / 曲線 / ドット / シンプル</td></tr>
-  </table>
+<h3>📄 ドキュメント（5種）</h3>
+<p>ワークシート・PDFレポート・契約書・名刺・セールスレターに。</p>
+<div class="tbl-wrap">
+<table>
+<tr><th>フレーム名</th><th>用途</th><th>画面比率</th><th>推奨Canvaサイズ</th></tr>
+<tr><td>A4用紙</td><td>角折れのA4用紙（1枚）</td><td>2:3 縦</td><td>794×1123（A4）</td></tr>
+<tr><td>A4ファイル</td><td>複数枚重ねのファイル</td><td>4:5 縦</td><td>1080×1350</td></tr>
+<tr><td>メモ冊子</td><td>斜め置きの冊子・レポート</td><td>ほぼ正方形</td><td>1080×1080</td></tr>
+<tr><td>カード</td><td>名刺・会員カード</td><td>16:10 横</td><td>1400×900</td></tr>
+<tr><td>封筒</td><td>セールスレター・招待状</td><td>4:3 横</td><td>1123×794</td></tr>
+</table>
 </div>
-<div class="alert alert-ok">✅ ヘッドラインとサブヘッドラインは「雰囲気」と「ターゲット」を選ぶだけで自動生成されます。手動入力は不要です。</div>
 
-<h2 id="lp-prompt">素材生成ツール — プロンプト生成</h2>
-<div class="step"><div class="step-num">1</div><div class="step-body"><div class="step-title">「⚡ プロンプト4件を生成」をクリック</div><div class="step-desc">4サイズ分のCanva用プロンプトが一括で生成されます。</div></div></div>
-<div class="step"><div class="step-num">2</div><div class="step-body"><div class="step-title">個別にコピー or 全件コピー</div><div class="step-desc">各サイズの「📋 コピー」ボタンで個別コピー、または「📋 4件すべてコピー」で一括コピーできます。</div></div></div>
-
-<hr class="divider">
-
-<h2 id="canva">Canvaでの使い方</h2>
-<p>生成されたプロンプトをCanvaで使って、モックアップ用の素材画像を作ります。</p>
-<h3>デザインを作成する</h3>
-<div class="step"><div class="step-num blue">1</div><div class="step-body"><div class="step-title"><a href="https://www.canva.com/" target="_blank" style="color:var(--blue)">canva.com</a> にアクセス</div><div class="step-desc">アカウントがない場合は無料で作成できます。</div></div></div>
-<div class="step"><div class="step-num blue">2</div><div class="step-body"><div class="step-title">「デザインを作成」→ サイズを選ぶ</div><div class="step-desc">プロンプトに書かれているサイズに合わせて選択。例：「プレゼンテーション」「ストーリー」など。</div></div></div>
-<div class="step"><div class="step-num blue">3</div><div class="step-body"><div class="step-title">Canva AIにプロンプトを貼り付け</div><div class="step-desc">コピーしたプロンプトを貼り付けてデザインを生成します。</div></div></div>
-<h3>テキストを日本語に差し替え → PNGで書き出し</h3>
-<p>生成されたデザインは英語テキストが入っています。これを日本語に差し替え、右上の「共有」→「ダウンロード」→「PNG」で書き出します。</p>
-<p>ダウンロードしたPNGをMockup Composerのコンテンツ画像としてアップロードし、3Dモックアップを完成させます。</p>
-<div class="alert alert-info">💡 Canvaの無料プランでは最大 4,000 × 2,250px のPNGがダウンロード可能です。</div>
-
-<hr class="divider">
-
-<h2 id="faq">よくある質問</h2>
-<div class="faq-q">Q. デザインの経験がまったくありませんが使えますか？</div>
-<div class="faq-a">はい。フレームを選んで画像をアップロードするだけです。デザインスキルは不要です。</div>
-<div class="faq-q">Q. スマホでも使えますか？</div>
-<div class="faq-a">ブラウザで動作するので使えますが、画面サイズの関係からPCでの操作を推奨します。</div>
-<div class="faq-q">Q. 書き出した画像の著作権は？</div>
-<div class="faq-a">あなたが作成したモックアップ画像の著作権はあなたに帰属します。商用利用も自由です。</div>
-<div class="faq-q">Q. コンテンツ画像がフレームからはみ出す</div>
-<div class="faq-a">「画面領域（オレンジ枠）」のサイズ・位置をドラッグで調整してください。</div>
-<div class="faq-q">Q. ウォーターマークを消したい</div>
-<div class="faq-a">メール登録後、SNSでシェアすると透かしが消えます。Facebook / X / LINEのいずれかでOK。</div>
-<div class="faq-q">Q. 素材生成ツールの配色が正しくない</div>
-<div class="faq-a">自動取得された配色は目安です。編集画面で色をクリックすると手動で変更できます。</div>
-<div class="faq-q">Q. メール配信を停止したい</div>
-<div class="faq-a">メール末尾の「配信停止」リンクから1クリックで停止できます。</div>
-
-<div style="text-align:center;margin-top:60px;font-size:11px;color:var(--text3);line-height:2.2">
-  <div>BESTAD G.K.</div>
-  <div><a href="https://bestad.biz/tokushou.html" target="_blank" rel="noopener noreferrer" style="color:var(--text3);text-decoration:none">特定商取引法に基づく表記</a> ｜ <a href="https://bestad.biz/privacypolicy.html" target="_blank" rel="noopener noreferrer" style="color:var(--text3);text-decoration:none">プライバシーポリシー</a></div>
-  <div>© 2026 BESTAD G.K. All Rights Reserved</div>
+<h3>✅ チェックリスト（2種）</h3>
+<p>ステップバイステップ・行動リスト・進捗管理の特典に。</p>
+<div class="tbl-wrap">
+<table>
+<tr><th>フレーム名</th><th>用途</th><th>画面比率</th><th>推奨Canvaサイズ</th></tr>
+<tr><td>チェックリスト縦</td><td>縦型チェックリスト</td><td>A4縦</td><td>794×1123</td></tr>
+<tr><td>チェックリスト横</td><td>横型チェックリスト</td><td>A4横</td><td>1123×794</td></tr>
+</table>
 </div>
+
+<h3>📖 書籍・メディア（3種）</h3>
+<p>E-Book・音声教材・ジャーナル・リードマグネットに。</p>
+<div class="tbl-wrap">
+<table>
+<tr><th>フレーム名</th><th>用途</th><th>画面比率</th><th>推奨Canvaサイズ</th></tr>
+<tr><td>E-Book</td><td>PDF書籍・無料レポート</td><td>ほぼ正方形</td><td>1080×1080</td></tr>
+<tr><td>CDケース</td><td>音声教材・瞑想音声・ポッドキャスト</td><td>4:5 縦</td><td>1080×1350</td></tr>
+<tr><td>ジャーナル</td><td>見開きノート・ワークブック</td><td>ほぼ正方形</td><td>1080×1080</td></tr>
+</table>
+</div>
+
+<h3>🏅 認定証（1種）</h3>
+<p>講座修了証・コーチング認定・ディプロマ。Expert Secretsの「認定プログラム」に。</p>
+<div class="tbl-wrap">
+<table>
+<tr><th>フレーム名</th><th>用途</th><th>画面比率</th><th>推奨Canvaサイズ</th></tr>
+<tr><td>修了証書</td><td>修了証・認定証・ディプロマ</td><td>16:10 横</td><td>1400×900</td></tr>
+</table>
+</div>
+
+<h3>🎖 デコレーション（8種）</h3>
+<p>フレームの上に重ねる装飾素材。知覚価値を高めるバッジ・スタンプ・アクセサリ。</p>
+<div class="tbl-wrap">
+<table>
+<tr><th>名前</th><th>用途</th></tr>
+<tr><td>メダル赤</td><td>ゴールドメダル+赤リボン。受賞・No.1訴求</td></tr>
+<tr><td>BESTメダル</td><td>王冠+月桂樹。ベストセラー・人気No.1</td></tr>
+<tr><td>Bonusスタンプ</td><td>青スタンプ。特典・ボーナス教材の強調</td></tr>
+<tr><td>ライオンメダル</td><td>ライオン紋章メダル。権威・信頼の演出</td></tr>
+<tr><td>Secretスタンプ</td><td>赤スタンプ。限定公開・シークレット教材</td></tr>
+<tr><td>Certifiedバッジ</td><td>認定バッジ。公式認定・品質保証</td></tr>
+<tr><td>ペン</td><td>Apple Pencil。デジタルツール感の演出</td></tr>
+<tr><td>AirPods</td><td>音声コンテンツ・ポッドキャストの演出</td></tr>
+</table>
+</div>
+<div class="tip">💡 デコレーションは「画面領域」を持ちません。フレームとして選択した後、サイズ・位置・回転を調整して他のパーツの上に重ねて使います。</div>
+
+<!-- ===== 機能詳細 ===== -->
+<h2>主要機能</h2>
+
+<div class="feature">
+  <div class="feature-title"><span>🎨</span> コンテンツ表示タイプ</div>
+  <p><strong>画像</strong>：自分の画像をアップロード（カバー / 収める / 引き伸ばし）<br>
+  <strong>グラデーション</strong>：CSSグラデーションで背景色を設定<br>
+  <strong>単色</strong>：単色の背景<br>
+  <strong>透過</strong>：背景なし（フレームのみ表示）</p>
+</div>
+
+<div class="feature">
+  <div class="feature-title"><span>🔄</span> 3D変形</div>
+  <p><strong>回転X/Y/Z</strong>：3軸で自由に回転<br>
+  <strong>スケール</strong>：0.1〜3.0倍で拡大縮小<br>
+  <strong>影</strong>：影の有無を切り替え（ドロップシャドウ）</p>
+</div>
+
+<div class="feature">
+  <div class="feature-title"><span>📤</span> エクスポート</div>
+  <p><strong>フォーマット</strong>：PNG（透過対応）/ JPEG / WebP<br>
+  <strong>解像度</strong>：72dpi（Web用）/ 96dpi（標準）/ 300dpi（印刷用）<br>
+  <strong>背景色</strong>：カスタム背景色を設定可能</p>
+</div>
+
+<div class="feature">
+  <div class="feature-title"><span>📋</span> テンプレート</div>
+  <p>ワンクリックで複数パーツを配置：<br>
+  <strong>単品（iMac）</strong>/ <strong>横並び2点</strong>/ <strong>Stack 3点</strong>/ <strong>フルセット5点</strong></p>
+</div>
+
+<div class="feature">
+  <div class="feature-title"><span>🗑</span> リセット</div>
+  <p>「リセット」ボタンで全パーツを一括削除。キャンバスをまっさらな状態に戻します。</p>
+</div>
+
+<!-- ===== Tips ===== -->
+<h2>Tips</h2>
+
+<div class="tip">💡 <strong>スタックスライドの作り方：</strong>テンプレートの「フルセット5点」を使うと、ラッセル・ブランソン流のオファー積み上げ表示が一瞬で作れます。各パーツにコンテンツ画像をセットすれば完成。</div>
+
+<div class="tip">💡 <strong>Canvaとの連携：</strong>この一覧表の「推奨Canvaサイズ」でデザインを作成し、PNGでエクスポート → Mockup Composerのコンテンツ画像としてアップロードするのがベストな流れです。</div>
+
+<div class="tip">💡 <strong>パーツの重ね順：</strong>パーツリストの▲▼ボタンでレイヤー順を変更できます。上にあるパーツほど前面に表示されます。</div>
+
+<div class="tip">💡 <strong>フレームライブラリ：</strong>自分で用意したフレーム画像もアップロードして「ライブラリに保存」できます。次回以降も使い回し可能です。</div>
+
+<!-- Footer -->
+<div class="footer">
+  <p>BESTAD G.K.</p>
+  <p>&copy; 2026 BESTAD G.K. All Rights Reserved</p>
+</div>
+
 </div>
 </body>
 </html>

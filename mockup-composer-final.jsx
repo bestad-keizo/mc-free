@@ -8,6 +8,39 @@ const IS_FREE = false;
 let _id = 0;
 const uid = () => "f" + (++_id);
 
+// ===== 4-Point Perspective Transform (CSS matrix3d) =====
+function quadMatrix3d(w, h, pts) {
+  // Map rect (0,0)-(w,0)-(w,h)-(0,h) to quad pts[TL,TR,BR,BL]
+  var s = [[0,0],[w,0],[w,h],[0,h]];
+  var d = pts.map(function(p){return [p.x,p.y];});
+  var A = [];
+  for (var i = 0; i < 4; i++) {
+    A.push([s[i][0],s[i][1],1, 0,0,0, -d[i][0]*s[i][0],-d[i][0]*s[i][1], d[i][0]]);
+    A.push([0,0,0, s[i][0],s[i][1],1, -d[i][1]*s[i][0],-d[i][1]*s[i][1], d[i][1]]);
+  }
+  var n = 8;
+  for (var c = 0; c < n; c++) {
+    var mr = c;
+    for (var r = c+1; r < n; r++) { if (Math.abs(A[r][c]) > Math.abs(A[mr][c])) mr = r; }
+    var tmp = A[c]; A[c] = A[mr]; A[mr] = tmp;
+    if (Math.abs(A[c][c]) < 1e-10) return "none";
+    for (var r = c+1; r < n; r++) {
+      var f = A[r][c] / A[c][c];
+      for (var j = c; j <= n; j++) A[r][j] -= f * A[c][j];
+    }
+  }
+  var x = new Array(n);
+  for (var i = n-1; i >= 0; i--) {
+    x[i] = A[i][n];
+    for (var j = i+1; j < n; j++) x[i] -= A[i][j] * x[j];
+    x[i] /= A[i][i];
+  }
+  return "matrix3d("+x[0]+","+x[3]+",0,"+x[6]+","+x[1]+","+x[4]+",0,"+x[7]+",0,0,1,0,"+x[2]+","+x[5]+",0,1)";
+}
+function rectToPts(sx,sy,sw,sh) {
+  return [{x:sx,y:sy},{x:sx+sw,y:sy},{x:sx+sw,y:sy+sh},{x:sx,y:sy+sh}];
+}
+
 // ===== FRAME LIBRARY (persistent storage) =====
 // ===== BUILT-IN FRAMES =====
 const FRAME_BASE = "https://bestad-keizo.github.io/mc-free/frames/";
@@ -124,9 +157,11 @@ function createItem(overrides = {}) {
     x: 100, y: 100, rotateX: 0, rotateY: 0, rotateZ: 0, scale: 1, zIndex: 5,
     frameUrl: null, frameW: 400, frameH: 400,
     screenX: 10, screenY: 10, screenW: 180, screenH: 200,
+    screenPts: null,
     contentImage: null, contentFit: "cover",
     contentSkewX: 0, contentSkewY: 0, contentRotateY: 0,
     spineX: 0, spineY: 0, spineW: 0, spineH: 0,
+    spinePts: null,
     spineImage: null, spineSkewX: 0, spineSkewY: 0, spineRotateY: 0,
     contentType: "gradient",
     bgColor: "#0c0c1a",
@@ -174,7 +209,13 @@ function ItemRender({ item: d }) {
       }}>フレームなし</div>}
 
       {/* Layer 2: Cover content (IN FRONT of frame) */}
-      <div style={{ position: "absolute", left: d.screenX, top: d.screenY, width: d.screenW, height: d.screenH, zIndex: 2, transform: contentTransform, transformOrigin: "center center" }}>
+      {(() => {
+        const pts = d.screenPts;
+        const useQuad = pts && pts.length === 4;
+        const cStyle = useQuad
+          ? { position: "absolute", left: 0, top: 0, width: d.screenW, height: d.screenH, zIndex: 2, transformOrigin: "0 0", transform: quadMatrix3d(d.screenW, d.screenH, pts) }
+          : { position: "absolute", left: d.screenX, top: d.screenY, width: d.screenW, height: d.screenH, zIndex: 2, transform: contentTransform, transformOrigin: "center center" };
+        return <div style={cStyle}>
         {hasImg && (
           <img src={d.contentImage} style={{
             width: "100%", height: "100%",
@@ -194,14 +235,20 @@ function ItemRender({ item: d }) {
             {d.subtitle && <div style={{ fontSize: d.subtitleSize, fontWeight: 700, color: d.subtitleColor, marginTop: 3, wordBreak: "break-word", whiteSpace: "pre-line" }}>{d.subtitle}</div>}
           </div>
         )}
-      </div>
+      </div>;
+      })()}
 
       {/* Layer 3: Spine content (for book-type frames) */}
-      {hasSpine && (
-        <div style={{ position: "absolute", left: d.spineX, top: d.spineY, width: d.spineW, height: d.spineH, zIndex: 3, transform: spineTransform, transformOrigin: "center center" }}>
+      {hasSpine && (() => {
+        const sp = d.spinePts;
+        const useQuadSp = sp && sp.length === 4;
+        const spStyle = useQuadSp
+          ? { position: "absolute", left: 0, top: 0, width: d.spineW, height: d.spineH, zIndex: 3, transformOrigin: "0 0", transform: quadMatrix3d(d.spineW, d.spineH, sp) }
+          : { position: "absolute", left: d.spineX, top: d.spineY, width: d.spineW, height: d.spineH, zIndex: 3, transform: spineTransform, transformOrigin: "center center" };
+        return <div style={spStyle}>
           <img src={d.spineImage} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} alt="" />
-        </div>
-      )}
+        </div>;
+      })()}
     </div>
   );
 }
@@ -212,40 +259,72 @@ function ScreenAreaEditor({ item, onUpdate }) {
   const startPos = useRef({});
   const ps = Math.min(220 / item.frameW, 220 / item.frameH, 1);
   const hasSpine = item.spineW > 0 && item.spineH > 0;
+  // Derive screenPts if not set
+  const pts = item.screenPts || rectToPts(item.screenX, item.screenY, item.screenW, item.screenH);
+
   const onDown = (e, mode) => {
     e.preventDefault(); e.stopPropagation();
     dragging.current = mode;
-    startPos.current = { mx: e.clientX, my: e.clientY, sx: item.screenX, sy: item.screenY, sw: item.screenW, sh: item.screenH, spx: item.spineX, spy: item.spineY, spw: item.spineW, sph: item.spineH };
+    startPos.current = { mx: e.clientX, my: e.clientY, pts: pts.map(function(p){return {x:p.x,y:p.y};}), spx: item.spineX, spy: item.spineY, spw: item.spineW, sph: item.spineH };
     const onMove = (ev) => {
       const dx = (ev.clientX - startPos.current.mx) / ps, dy = (ev.clientY - startPos.current.my) / ps;
-      if (dragging.current === "move") onUpdate(item.id, { screenX: Math.round(startPos.current.sx + dx), screenY: Math.round(startPos.current.sy + dy) });
-      else if (dragging.current === "resize") onUpdate(item.id, { screenW: Math.max(20, Math.round(startPos.current.sw + dx)), screenH: Math.max(20, Math.round(startPos.current.sh + dy)) });
-      else if (dragging.current === "spine-move") onUpdate(item.id, { spineX: Math.round(startPos.current.spx + dx), spineY: Math.round(startPos.current.spy + dy) });
-      else if (dragging.current === "spine-resize") onUpdate(item.id, { spineW: Math.max(5, Math.round(startPos.current.spw + dx)), spineH: Math.max(20, Math.round(startPos.current.sph + dy)) });
+      const sp = startPos.current;
+      if (dragging.current === "spine-move") { onUpdate(item.id, { spineX: Math.round(sp.spx + dx), spineY: Math.round(sp.spy + dy) }); return; }
+      if (dragging.current === "spine-resize") { onUpdate(item.id, { spineW: Math.max(5, Math.round(sp.spw + dx)), spineH: Math.max(20, Math.round(sp.sph + dy)) }); return; }
+      var np = sp.pts.map(function(p){return {x:p.x,y:p.y};});
+      if (dragging.current === "move-all") {
+        np = np.map(function(p){return {x:Math.round(p.x+dx),y:Math.round(p.y+dy)};});
+      } else {
+        var idx = parseInt(dragging.current.replace("pt",""));
+        if (!isNaN(idx)) { np[idx] = {x:Math.round(sp.pts[idx].x+dx), y:Math.round(sp.pts[idx].y+dy)}; }
+      }
+      // Update screenPts and derive bounding box for screenW/H
+      var bx = Math.min(np[0].x,np[1].x,np[2].x,np[3].x);
+      var by = Math.min(np[0].y,np[1].y,np[2].y,np[3].y);
+      var bw = Math.max(np[0].x,np[1].x,np[2].x,np[3].x) - bx;
+      var bh = Math.max(np[0].y,np[1].y,np[2].y,np[3].y) - by;
+      onUpdate(item.id, { screenPts: np, screenX: bx, screenY: by, screenW: Math.max(20, bw), screenH: Math.max(20, bh) });
     };
     const onUp = () => { dragging.current = null; window.removeEventListener("mousemove", onMove); window.removeEventListener("mouseup", onUp); };
     window.addEventListener("mousemove", onMove); window.addEventListener("mouseup", onUp);
   };
+
+  // SVG polygon for quad outline
+  const polyStr = pts.map(function(p){return (p.x*ps)+","+(p.y*ps);}).join(" ");
+
   return (
     <div style={{ background: "#0d1117", borderRadius: 10, padding: 10, border: "1px solid #1e2535", marginTop: 6 }}>
-      <div style={{ fontSize: 11, fontWeight: 700, color: "#f97316", marginBottom: 6 }}>📐 画面領域（ドラッグで調整）</div>
-      <div style={{ position: "relative", width: item.frameW * ps, height: item.frameH * ps, margin: "0 auto", background: "#222", borderRadius: 8, overflow: "hidden" }}>
-        {item.frameUrl && <img src={item.frameUrl} style={{ width: "100%", height: "100%", opacity: 0.6 }} alt="" />}
-        {/* Cover area (orange) */}
-        <div onMouseDown={e => onDown(e, "move")} style={{ position: "absolute", left: item.screenX * ps, top: item.screenY * ps, width: item.screenW * ps, height: item.screenH * ps, border: "2px solid #f97316", background: "rgba(249,115,22,.15)", cursor: "move", borderRadius: 2 }}>
-          <div style={{ position: "absolute", top: 2, left: 4, fontSize: 9, color: "#f97316" }}>表紙</div>
-          <div onMouseDown={e => onDown(e, "resize")} style={{ position: "absolute", bottom: -4, right: -4, width: 10, height: 10, background: "#f97316", borderRadius: 2, cursor: "nwse-resize" }} />
-        </div>
+      <div style={{ fontSize: 11, fontWeight: 700, color: "#f97316", marginBottom: 6 }}>📐 画面領域（4点ドラッグ）</div>
+      <div style={{ padding: "8px 0" }}>
+      <div style={{ position: "relative", width: item.frameW * ps, height: item.frameH * ps, margin: "0 auto", background: "#222", borderRadius: 8 }}>
+        {item.frameUrl && <img src={item.frameUrl} style={{ width: "100%", height: "100%", opacity: 0.6, borderRadius: 8 }} alt="" />}
+        {/* Quad outline */}
+        <svg style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", pointerEvents: "none" }}>
+          <polygon points={polyStr} fill="rgba(249,115,22,.12)" stroke="#f97316" strokeWidth="2" />
+        </svg>
+        {/* Move area (click inside the quad) */}
+        <div onMouseDown={e => onDown(e, "move-all")} style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", cursor: "move" }} />
+        {/* 4 corner handles */}
+        {pts.map(function(p, i) {
+          var labels = ["TL","TR","BR","BL"];
+          return <div key={i} onMouseDown={function(e){onDown(e, "pt"+i);}} style={{ position: "absolute", left: p.x * ps - 6, top: p.y * ps - 6, width: 12, height: 12, background: "#f97316", borderRadius: "50%", cursor: "crosshair", border: "2px solid #fff", zIndex: 10 }}>
+            <div style={{ position: "absolute", top: -14, left: "50%", transform: "translateX(-50%)", fontSize: 7, color: "#f97316", whiteSpace: "nowrap" }}>{labels[i]}</div>
+          </div>;
+        })}
         {/* Spine area (purple) */}
-        {hasSpine && <div onMouseDown={e => onDown(e, "spine-move")} style={{ position: "absolute", left: item.spineX * ps, top: item.spineY * ps, width: item.spineW * ps, height: item.spineH * ps, border: "2px solid #a855f7", background: "rgba(168,85,247,.2)", cursor: "move", borderRadius: 2 }}>
+        {hasSpine && <div onMouseDown={e => onDown(e, "spine-move")} style={{ position: "absolute", left: item.spineX * ps, top: item.spineY * ps, width: item.spineW * ps, height: item.spineH * ps, border: "2px solid #a855f7", background: "rgba(168,85,247,.2)", cursor: "move", borderRadius: 2, zIndex: 5 }}>
           <div style={{ position: "absolute", top: 2, left: 2, fontSize: 7, color: "#a855f7", writingMode: "vertical-rl" }}>背表紙</div>
           <div onMouseDown={e => onDown(e, "spine-resize")} style={{ position: "absolute", bottom: -4, right: -4, width: 8, height: 8, background: "#a855f7", borderRadius: 2, cursor: "nwse-resize" }} />
         </div>}
       </div>
+      </div>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 3, marginTop: 6 }}>
-        {[["X", "screenX"], ["Y", "screenY"], ["幅", "screenW"], ["高", "screenH"]].map(([l, k]) => (
-          <div key={k}><label style={{ fontSize: 9, color: "#f97316" }}>{l}</label><input type="number" value={item[k]} onChange={e => onUpdate(item.id, { [k]: +e.target.value })} style={{ width: "100%", padding: "3px 5px", background: "#161b26", border: "1px solid #2a3040", borderRadius: 3, color: "#e4e4e7", fontSize: 12, outline: "none" }} /></div>
-        ))}
+        {["TL","TR","BR","BL"].map(function(label, i) {
+          return <div key={i} style={{ fontSize: 8, color: "#f97316", textAlign: "center" }}>
+            <div>{label}</div>
+            <div style={{ color: "#999" }}>{pts[i].x},{pts[i].y}</div>
+          </div>;
+        })}
       </div>
       {hasSpine && <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 3, marginTop: 4 }}>
         {[["X", "spineX"], ["Y", "spineY"], ["幅", "spineW"], ["高", "spineH"]].map(([l, k]) => (
@@ -260,46 +339,65 @@ function ScreenAreaEditor({ item, onUpdate }) {
 function SpineAreaEditor({ item, onUpdate }) {
   const dragging = useRef(null);
   const startPos = useRef({});
-  // フレーム全体の縮小率（最大180px幅）
   const ps = Math.min(180 / item.frameW, 180 / item.frameH, 1);
+  const pts = item.spinePts || rectToPts(item.spineX, item.spineY, item.spineW, item.spineH);
+
   const onDown = (e, mode) => {
     e.preventDefault(); e.stopPropagation();
     dragging.current = mode;
-    startPos.current = { mx: e.clientX, my: e.clientY, spx: item.spineX, spy: item.spineY, spw: item.spineW, sph: item.spineH };
+    startPos.current = { mx: e.clientX, my: e.clientY, pts: pts.map(function(p){return {x:p.x,y:p.y};}) };
     const onMove = (ev) => {
       const dx = (ev.clientX - startPos.current.mx) / ps, dy = (ev.clientY - startPos.current.my) / ps;
-      if (dragging.current === "move")   onUpdate(item.id, { spineX: Math.round(startPos.current.spx + dx), spineY: Math.round(startPos.current.spy + dy) });
-      if (dragging.current === "resize") onUpdate(item.id, { spineW: Math.max(5, Math.round(startPos.current.spw + dx)), spineH: Math.max(10, Math.round(startPos.current.sph + dy)) });
+      const sp = startPos.current;
+      var np = sp.pts.map(function(p){return {x:p.x,y:p.y};});
+      if (dragging.current === "move-all") {
+        np = np.map(function(p){return {x:Math.round(p.x+dx),y:Math.round(p.y+dy)};});
+      } else {
+        var idx = parseInt(dragging.current.replace("spt",""));
+        if (!isNaN(idx)) { np[idx] = {x:Math.round(sp.pts[idx].x+dx), y:Math.round(sp.pts[idx].y+dy)}; }
+      }
+      var bx = Math.min(np[0].x,np[1].x,np[2].x,np[3].x);
+      var by = Math.min(np[0].y,np[1].y,np[2].y,np[3].y);
+      var bw = Math.max(np[0].x,np[1].x,np[2].x,np[3].x) - bx;
+      var bh = Math.max(np[0].y,np[1].y,np[2].y,np[3].y) - by;
+      onUpdate(item.id, { spinePts: np, spineX: bx, spineY: by, spineW: Math.max(5, bw), spineH: Math.max(10, bh) });
     };
     const onUp = () => { dragging.current = null; window.removeEventListener("mousemove", onMove); window.removeEventListener("mouseup", onUp); };
     window.addEventListener("mousemove", onMove); window.addEventListener("mouseup", onUp);
   };
+
+  const polyStr = pts.map(function(p){return (p.x*ps)+","+(p.y*ps);}).join(" ");
+  // 表紙の参考表示用
+  const coverPts = item.screenPts || rectToPts(item.screenX, item.screenY, item.screenW, item.screenH);
+  const coverPolyStr = coverPts.map(function(p){return (p.x*ps)+","+(p.y*ps);}).join(" ");
+
   return (
     <div style={{ background: "#110d1a", borderRadius: 8, padding: 8, border: "1px solid #2d1f45", marginTop: 6 }}>
-      <div style={{ fontSize: 10, fontWeight: 700, color: "#a855f7", marginBottom: 5 }}>📐 背表紙の画面領域（ドラッグで調整）</div>
-      {/* フレームプレビュー */}
-      <div style={{ position: "relative", width: item.frameW * ps, height: item.frameH * ps, margin: "0 auto", background: "#1a1a2e", borderRadius: 6, overflow: "hidden" }}>
-        {item.frameUrl && <img src={item.frameUrl} style={{ width: "100%", height: "100%", opacity: 0.5 }} alt="" />}
-        {/* 表紙エリア（薄いオレンジ参考表示・操作不可） */}
-        <div style={{ position: "absolute", left: item.screenX * ps, top: item.screenY * ps, width: item.screenW * ps, height: item.screenH * ps, border: "1px dashed rgba(249,115,22,.35)", borderRadius: 2, pointerEvents: "none" }}>
-          <div style={{ position: "absolute", top: 2, left: 3, fontSize: 7, color: "rgba(249,115,22,.5)" }}>表紙</div>
-        </div>
-        {/* 背表紙エリア（紫・ドラッグ可能） */}
-        <div onMouseDown={e => onDown(e, "move")} style={{ position: "absolute", left: item.spineX * ps, top: item.spineY * ps, width: item.spineW * ps, height: item.spineH * ps, border: "2px solid #a855f7", background: "rgba(168,85,247,.25)", cursor: "move", borderRadius: 2 }}>
-          <div style={{ position: "absolute", top: 2, left: 2, fontSize: 7, color: "#c084fc", writingMode: "vertical-rl", lineHeight: 1 }}>背表紙</div>
-          {/* リサイズハンドル */}
-          <div onMouseDown={e => onDown(e, "resize")} style={{ position: "absolute", bottom: -4, right: -4, width: 9, height: 9, background: "#a855f7", borderRadius: 2, cursor: "nwse-resize" }} />
-        </div>
+      <div style={{ fontSize: 10, fontWeight: 700, color: "#a855f7", marginBottom: 5 }}>📐 背表紙（4点ドラッグ）</div>
+      <div style={{ position: "relative", width: item.frameW * ps, height: item.frameH * ps, margin: "0 auto", background: "#1a1a2e", borderRadius: 6 }}>
+        {item.frameUrl && <img src={item.frameUrl} style={{ width: "100%", height: "100%", opacity: 0.5, borderRadius: 6 }} alt="" />}
+        {/* Cover reference (orange dashed) */}
+        <svg style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", pointerEvents: "none" }}>
+          <polygon points={coverPolyStr} fill="none" stroke="rgba(249,115,22,.3)" strokeWidth="1" strokeDasharray="4 3" />
+        </svg>
+        {/* Spine quad (purple) */}
+        <svg style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", pointerEvents: "none" }}>
+          <polygon points={polyStr} fill="rgba(168,85,247,.15)" stroke="#a855f7" strokeWidth="2" />
+        </svg>
+        {/* Move area */}
+        <div onMouseDown={e => onDown(e, "move-all")} style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", cursor: "move" }} />
+        {/* 4 corner handles */}
+        {pts.map(function(p, i) {
+          return <div key={i} onMouseDown={function(e){onDown(e, "spt"+i);}} style={{ position: "absolute", left: p.x * ps - 5, top: p.y * ps - 5, width: 10, height: 10, background: "#a855f7", borderRadius: "50%", cursor: "crosshair", border: "2px solid #fff", zIndex: 10 }} />;
+        })}
       </div>
-      {/* 数値入力 */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 3, marginTop: 5 }}>
-        {[["X", "spineX"], ["Y", "spineY"], ["幅", "spineW"], ["高", "spineH"]].map(([l, k]) => (
-          <div key={k}>
-            <label style={{ fontSize: 8, color: "#a855f7" }}>{l}</label>
-            <input type="number" value={item[k]} onChange={e => onUpdate(item.id, { [k]: +e.target.value })}
-              style={{ width: "100%", padding: "3px 4px", background: "#161b26", border: "1px solid #2a3040", borderRadius: 3, color: "#e4e4e7", fontSize: 11, outline: "none" }} />
-          </div>
-        ))}
+        {["TL","TR","BR","BL"].map(function(label, i) {
+          return <div key={i} style={{ fontSize: 8, color: "#a855f7", textAlign: "center" }}>
+            <div>{label}</div>
+            <div style={{ color: "#999" }}>{pts[i].x},{pts[i].y}</div>
+          </div>;
+        })}
       </div>
     </div>
   );
@@ -379,9 +477,9 @@ function Editor({ item, onUpdate, onRemove, onDuplicate, frameLib }) {
                   const s = img.naturalWidth > 400 ? 400 / img.naturalWidth : 1;
                   const upd = { frameUrl: f.url, frameW: Math.round(img.naturalWidth * s), frameH: Math.round(img.naturalHeight * s) };
                   const preset = SCREEN_PRESETS[f.id];
-                  if (preset) { upd.screenX = preset.sx; upd.screenY = preset.sy; upd.screenW = preset.sw; upd.screenH = preset.sh; }
+                  if (preset) { upd.screenX = preset.sx; upd.screenY = preset.sy; upd.screenW = preset.sw; upd.screenH = preset.sh; upd.screenPts = rectToPts(preset.sx, preset.sy, preset.sw, preset.sh); }
                   const spine = SPINE_PRESETS[f.id];
-                  if (spine) { upd.spineX = spine.sx; upd.spineY = spine.sy; upd.spineW = spine.sw; upd.spineH = spine.sh; } else { upd.spineW = 0; upd.spineH = 0; upd.spineImage = null; }
+                  if (spine) { upd.spineX = spine.sx; upd.spineY = spine.sy; upd.spineW = spine.sw; upd.spineH = spine.sh; upd.spinePts = rectToPts(spine.sx, spine.sy, spine.sw, spine.sh); } else { upd.spineW = 0; upd.spineH = 0; upd.spineImage = null; upd.spinePts = null; }
                   onUpdate(item.id, upd);
                 }; img.src = f.url;
               }}>
@@ -402,9 +500,9 @@ function Editor({ item, onUpdate, onRemove, onDuplicate, frameLib }) {
                   const s = img.naturalWidth > 400 ? 400 / img.naturalWidth : 1;
                   const upd = { frameUrl: f.url, frameW: Math.round(img.naturalWidth * s), frameH: Math.round(img.naturalHeight * s) };
                   const preset = SCREEN_PRESETS[f.id];
-                  if (preset) { upd.screenX = preset.sx; upd.screenY = preset.sy; upd.screenW = preset.sw; upd.screenH = preset.sh; }
+                  if (preset) { upd.screenX = preset.sx; upd.screenY = preset.sy; upd.screenW = preset.sw; upd.screenH = preset.sh; upd.screenPts = rectToPts(preset.sx, preset.sy, preset.sw, preset.sh); }
                   const spine = SPINE_PRESETS[f.id];
-                  if (spine) { upd.spineX = spine.sx; upd.spineY = spine.sy; upd.spineW = spine.sw; upd.spineH = spine.sh; } else { upd.spineW = 0; upd.spineH = 0; upd.spineImage = null; }
+                  if (spine) { upd.spineX = spine.sx; upd.spineY = spine.sy; upd.spineW = spine.sw; upd.spineH = spine.sh; upd.spinePts = rectToPts(spine.sx, spine.sy, spine.sw, spine.sh); } else { upd.spineW = 0; upd.spineH = 0; upd.spineImage = null; upd.spinePts = null; }
                   onUpdate(item.id, upd);
                 }; img.src = f.url;
               }}>
@@ -1488,7 +1586,7 @@ export default function App() {
     var getPreset = function(bid){return SCREEN_PRESETS[bid]||{sx:10,sy:10,sw:180,sh:200};};
     var mk = function(bid,name,x,y,scale,rotY){
       var p = getPreset(bid);
-      return createItem({name:name,x:x,y:y,scale:scale||1,rotateY:rotY||0,frameUrl:getFrame(bid),frameW:400,frameH:400,screenX:p.sx,screenY:p.sy,screenW:p.sw,screenH:p.sh});
+      return createItem({name:name,x:x,y:y,scale:scale||1,rotateY:rotY||0,frameUrl:getFrame(bid),frameW:400,frameH:400,screenX:p.sx,screenY:p.sy,screenW:p.sw,screenH:p.sh,screenPts:rectToPts(p.sx,p.sy,p.sw,p.sh)});
     };
     var newItems = [];
     if(tpl==="stack3"){
@@ -1639,7 +1737,8 @@ export default function App() {
             <button onClick={function(){setShowHelp(!showHelp);setShowExport(false);setCanvaOpen(false);setCfOpen(false);}} style={{ width: 36, height: 36, borderRadius: "50%", background: showHelp ? "#f97316" : "#161b26", color: showHelp ? "#fff" : "#888", border: "1px solid #2a3040", fontSize: 16, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", justifyContent: "center" }}>?</button>
             {showHelp && <div style={{ position: "absolute", top: "100%", right: 0, marginTop: 8, background: "#161b26", borderRadius: 12, padding: 6, boxShadow: "0 12px 40px rgba(0,0,0,.4)", zIndex: 100, width: 220, border: "1px solid #2a3040" }} onClick={function(e){e.stopPropagation();}}>
               <div style={{ fontSize: 12, fontWeight: 700, color: "#f97316", padding: "8px 12px", borderBottom: "1px solid #2a3040" }}>ヘルプ・マニュアル</div>
-              <a href="#" onClick={function(e){e.preventDefault();var _u=["\x61\x48\x52\x30\x63\x48\x4d\x36\x4c\x79\x39\x33\x64\x33\x63\x75\x5a\x6e\x56\x75\x62\x6d\x56\x73","\x59\x6e\x56\x70\x62\x47\x52\x70\x62\x6d\x63\x75\x59\x32\x78\x31\x59\x69\x39\x74\x62\x32\x4e\x72\x64\x58\x41\x3d","\x4c\x57\x4e\x76\x62\x58\x42\x76\x63\x32\x56\x79\x4c\x57\x64\x31\x61\x57\x52\x6c"].map(function(s){return atob(s);}).join("");window.open(_u,"_blank");setShowHelp(false);}} style={{ display: "block", padding: "10px 12px", fontSize: 12, color: "#fff", textDecoration: "none", borderRadius: 6, cursor: "pointer", background: "linear-gradient(135deg,rgba(249,115,22,.2),rgba(79,142,247,.15))", margin: "4px", fontWeight: 700, border: "1px solid rgba(249,115,22,.3)" }}>📖 完全ガイド（別タブで開く）</a>
+              <a href="#" onClick={function(e){e.preventDefault();window.open(FRAME_BASE.replace("/frames/","")+"/"+"guide.html","_blank");setShowHelp(false);}} style={{ display: "block", padding: "10px 12px", fontSize: 12, color: "#fff", textDecoration: "none", borderRadius: 6, cursor: "pointer", background: "linear-gradient(135deg,rgba(249,115,22,.2),rgba(79,142,247,.15))", margin: "4px", fontWeight: 700, border: "1px solid rgba(249,115,22,.3)" }}>📖 モックアップガイド</a>
+              <a href="#" onClick={function(e){e.preventDefault();window.open(FRAME_BASE.replace("/frames/","")+"/"+"guide-tool.html","_blank");setShowHelp(false);}} style={{ display: "block", padding: "10px 12px", fontSize: 12, color: "#fff", textDecoration: "none", borderRadius: 6, cursor: "pointer", background: "linear-gradient(135deg,rgba(139,92,246,.2),rgba(99,102,241,.15))", margin: "4px", fontWeight: 700, border: "1px solid rgba(139,92,246,.3)" }}>🎨 素材生成ツールガイド</a>
               <div style={{ borderTop: "1px solid #2a3040", margin: "4px 0" }} />
               <a href="#" onClick={function(e){e.preventDefault();window.open("mailto:info@bestad.biz?subject=Mockup Composer お問い合わせ","_blank");}} style={{ display: "block", padding: "10px 12px", fontSize: 12, color: "#e4e4e7", textDecoration: "none", borderRadius: 6, cursor: "pointer" }}>📧 お問い合わせ</a>
               <div style={{ borderTop: "1px solid #2a3040", padding: "8px 12px", marginTop: 4 }}>
@@ -1820,19 +1919,28 @@ export default function App() {
           </div>
 
           {/* DEMO VISUAL */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10, marginBottom: 32 }}>
-            {[
-              { icon: "🖥", name: "デバイス" },
-              { icon: "📦", name: "ボックス" },
-              { icon: "📄", name: "ドキュメント" },
-              { icon: "✅", name: "チェックリスト" },
-              { icon: "📖", name: "書籍・メディア" },
-              { icon: "🏅", name: "認定証" },
-              { icon: "🎖", name: "デコレーション" },
-            ].map(function(f,i){return <div key={i} style={{ background: "rgba(255,255,255,.03)", borderRadius: 12, padding: "16px 8px", textAlign: "center", border: "1px solid rgba(255,255,255,.06)" }}>
-              <div style={{ fontSize: 28, marginBottom: 4 }}>{f.icon}</div>
-              <div style={{ fontSize: 11, color: "#94a3b8", fontWeight: 600 }}>{f.name}</div>
-            </div>;})}
+          <div style={{ marginBottom: 32 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 10, marginBottom: 10 }}>
+              {[
+                { icon: "🖥", name: "デバイス" },
+                { icon: "📦", name: "ボックス" },
+                { icon: "📄", name: "ドキュメント" },
+                { icon: "✅", name: "チェックリスト" },
+              ].map(function(f,i){return <div key={i} style={{ background: "rgba(255,255,255,.03)", borderRadius: 12, padding: "16px 8px", textAlign: "center", border: "1px solid rgba(255,255,255,.06)" }}>
+                <div style={{ fontSize: 24, marginBottom: 4 }}>{f.icon}</div>
+                <div style={{ fontSize: 10, color: "#94a3b8", fontWeight: 600 }}>{f.name}</div>
+              </div>;})}
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
+              {[
+                { icon: "📖", name: "書籍・メディア" },
+                { icon: "🏅", name: "認定証" },
+                { icon: "🎖", name: "デコレーション" },
+              ].map(function(f,i){return <div key={i} style={{ background: "rgba(255,255,255,.03)", borderRadius: 12, padding: "16px 8px", textAlign: "center", border: "1px solid rgba(255,255,255,.06)" }}>
+                <div style={{ fontSize: 24, marginBottom: 4 }}>{f.icon}</div>
+                <div style={{ fontSize: 10, color: "#94a3b8", fontWeight: 600 }}>{f.name}</div>
+              </div>;})}
+            </div>
           </div>
 
           {/* 3 STEPS */}

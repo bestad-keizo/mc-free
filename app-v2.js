@@ -4564,10 +4564,7 @@ function App() {
     href: "#",
     onClick: function (e) {
       e.preventDefault();
-      var _u = ["\x61\x48\x52\x30\x63\x48\x4d\x36\x4c\x79\x39\x33\x64\x33\x63\x75\x5a\x6e\x56\x75\x62\x6d\x56\x73", "\x59\x6e\x56\x70\x62\x47\x52\x70\x62\x6d\x63\x75\x59\x32\x78\x31\x59\x69\x39\x74\x62\x32\x4e\x72\x64\x58\x41\x3d", "\x4c\x57\x4e\x76\x62\x58\x42\x76\x63\x32\x56\x79\x4c\x57\x64\x31\x61\x57\x52\x6c"].map(function (s) {
-        return atob(s);
-      }).join("");
-      window.open(_u, "_blank");
+      window.open(FRAME_BASE.replace("/frames/", "") + "/" + "guide.html", "_blank");
       setShowHelp(false);
     },
     style: {
@@ -4583,7 +4580,27 @@ function App() {
       fontWeight: 700,
       border: "1px solid rgba(249,115,22,.3)"
     }
-  }, "\uD83D\uDCD6 \u5B8C\u5168\u30AC\u30A4\u30C9\uFF08\u5225\u30BF\u30D6\u3067\u958B\u304F\uFF09"), /*#__PURE__*/React.createElement("div", {
+  }, "\uD83D\uDCD6 \u30E2\u30C3\u30AF\u30A2\u30C3\u30D7\u30AC\u30A4\u30C9"), /*#__PURE__*/React.createElement("a", {
+    href: "#",
+    onClick: function (e) {
+      e.preventDefault();
+      window.open(FRAME_BASE.replace("/frames/", "") + "/" + "guide-tool.html", "_blank");
+      setShowHelp(false);
+    },
+    style: {
+      display: "block",
+      padding: "10px 12px",
+      fontSize: 12,
+      color: "#fff",
+      textDecoration: "none",
+      borderRadius: 6,
+      cursor: "pointer",
+      background: "linear-gradient(135deg,rgba(139,92,246,.2),rgba(99,102,241,.15))",
+      margin: "4px",
+      fontWeight: 700,
+      border: "1px solid rgba(139,92,246,.3)"
+    }
+  }, "\uD83C\uDFA8 \u7D20\u6750\u751F\u6210\u30C4\u30FC\u30EB\u30AC\u30A4\u30C9"), /*#__PURE__*/React.createElement("div", {
     style: {
       borderTop: "1px solid #2a3040",
       margin: "4px 0"

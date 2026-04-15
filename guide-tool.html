@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>素材生成ツール ガイド | Mockup Composer</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;600;800&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0a0a12;color:#c8cdd5;font-family:'Noto Sans JP',sans-serif;font-size:15px;line-height:1.8}
+a{color:#8b5cf6;text-decoration:none}
+a:hover{text-decoration:underline}
+
+.wrap{max-width:820px;margin:0 auto;padding:24px 20px 80px}
+
+.hero{text-align:center;padding:48px 0 40px;border-bottom:1px solid #1e1e30;margin-bottom:40px}
+.hero-badge{display:inline-block;font-size:11px;color:#8b5cf6;border:1px solid rgba(139,92,246,.3);border-radius:20px;padding:4px 14px;margin-bottom:12px;letter-spacing:.05em}
+.hero h1{font-size:26px;font-weight:800;margin-bottom:8px;background:linear-gradient(135deg,#fff 40%,#8b5cf6);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero p{color:#94a3b8;font-size:14px}
+
+h2{font-size:20px;font-weight:800;color:#fff;margin:48px 0 16px;padding-bottom:8px;border-bottom:2px solid #8b5cf6}
+h3{font-size:16px;font-weight:700;color:#c4b5fd;margin:28px 0 10px}
+p{margin-bottom:14px}
+
+.steps{display:flex;flex-direction:column;gap:16px;margin:20px 0}
+.step{display:flex;gap:14px;align-items:flex-start;background:#111118;border-radius:12px;padding:16px;border:1px solid #1e1e30}
+.step-num{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:16px;color:#fff;flex-shrink:0}
+.step:nth-child(1) .step-num{background:#6366f1}
+.step:nth-child(2) .step-num{background:#8b5cf6}
+.step:nth-child(3) .step-num{background:#a78bfa}
+.step-body h4{font-size:14px;font-weight:700;color:#fff;margin-bottom:4px}
+.step-body p{font-size:13px;color:#94a3b8;margin-bottom:0}
+
+.tbl-wrap{overflow-x:auto;margin:16px 0 24px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{background:#1e1e30;color:#c4b5fd;font-weight:700;padding:10px 12px;text-align:left}
+td{padding:9px 12px;border-bottom:1px solid #1a1a28}
+tr:hover td{background:rgba(139,92,246,.04)}
+
+.feature{background:#111118;border-radius:14px;padding:20px;border:1px solid #1e1e30;margin:16px 0}
+.feature-title{font-size:15px;font-weight:700;color:#fff;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.feature-title span{font-size:20px}
+
+.tip{background:#0a0a1a;border-left:4px solid #8b5cf6;padding:12px 16px;border-radius:0 8px 8px 0;margin:16px 0;font-size:13px;color:#b0a0d0}
+
+.size-card{background:#111118;border:1px solid #1e1e30;border-radius:10px;padding:14px;text-align:center}
+.size-card .icon{font-size:24px;margin-bottom:4px}
+.size-card .name{font-size:13px;font-weight:700;color:#fff}
+.size-card .dim{font-size:12px;color:#8b5cf6;font-weight:600;margin:2px 0}
+.size-card .use{font-size:11px;color:#666}
+
+.footer{text-align:center;padding:40px 0 20px;border-top:1px solid #1e1e30;margin-top:48px;font-size:12px;color:#555}
+
+@media(max-width:600px){
+  .hero h1{font-size:22px}
+  h2{font-size:18px}
+  table{font-size:11px}
+  th,td{padding:7px 8px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-badge">Mockup Composer ツール</div>
+  <h1>LPプロンプト生成ツール ガイド</h1>
+  <p>LPスクショ＋テキスト → AI解析 → Canvaプロンプト4サイズ自動生成</p>
+</div>
+
+<!-- 概要 -->
+<h2>素材生成ツールとは？</h2>
+<p>LPプロンプト生成ツールは、あなたのLP（ランディングページ）のスクリーンショットやテキスト情報から、<strong>Canva AIで使えるデザインプロンプトを4サイズ同時に自動生成</strong>するツールです。</p>
+<p>手動入力ゼロ。6つのドロップダウンから選ぶだけで、配色・ヘッドライン・サブヘッドライン・CTA・装飾スタイルがすべて自動設定されます。</p>
+
+<!-- 3ステップ -->
+<h2>使い方：3ステップ</h2>
+<div class="steps">
+  <div class="step">
+    <div class="step-num">1</div>
+    <div class="step-body">
+      <h4>📤 アップロード</h4>
+      <p>LPのスクリーンショットをドラッグ＆ドロップ（複数画像OK）。LPのテキストもコピー＆ペーストできます。画像のみ・テキストのみ・両方いずれもOK。<br>アップロードすると、画像からカラーパレット（背景色・アクセント色・テキスト色）を自動抽出します。</p>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-num">2</div>
+    <div class="step-body">
+      <h4>✏️ 編集</h4>
+      <p>6つのドロップダウンから選択するだけ。ヘッドラインとサブヘッドラインは、「雰囲気×ターゲット」の組み合わせで英語テキストが自動生成されます（手動編集も可能）。</p>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-num">3</div>
+    <div class="step-body">
+      <h4>⚡ プロンプト生成</h4>
+      <p>「プロンプト4件を生成」ボタンで、4サイズのCanvaプロンプトが一括生成されます。各プロンプトをコピーしてCanva AIに貼り付ければ完成。</p>
+    </div>
+  </div>
+</div>
+
+<!-- 配色自動取得 -->
+<h2>配色自動取得</h2>
+<div class="feature">
+  <div class="feature-title"><span>🎨</span> Canvas APIによる色解析</div>
+  <p>アップロードされたLPスクリーンショットから、Canvas APIを使って<strong>3色のカラーパレット</strong>を自動抽出します。</p>
+  <p><strong>背景色</strong>：LPの主要な背景色<br>
+  <strong>アクセント色</strong>：CTAボタンやリンクの色<br>
+  <strong>テキスト色</strong>：見出しや本文のテキスト色</p>
+  <p>抽出された配色は編集画面で手動修正も可能です。</p>
+</div>
+
+<!-- 6つの設定項目 -->
+<h2>6つの設定項目</h2>
+
+<h3>① 配色（3色）</h3>
+<p>自動取得された色をそのまま使うか、カラーピッカーで手動変更できます。Canvaプロンプトにはこの3色がHEXコードで埋め込まれます。</p>
+
+<h3>② 雰囲気</h3>
+<div class="tbl-wrap">
+<table>
+<tr><th>選択肢</th><th>デザインの方向性</th></tr>
+<tr><td>プロフェッショナル</td><td>構造的なレイアウト、コーポレートな美観</td></tr>
+<tr><td>カジュアル</td><td>親しみやすい、温かみのあるトーン</td></tr>
+<tr><td>高級・ラグジュアリー</td><td>洗練されたタイポグラフィ、プレミアム感</td></tr>
+<tr><td>エネルギッシュ</td><td>大胆でダイナミック、鮮やかな色使い</td></tr>
+<tr><td>ミニマル</td><td>余白を活かした、すっきりとしたデザイン</td></tr>
+<tr><td>温かみのある</td><td>ソフトなテクスチャ、ナーチャリング感</td></tr>
+</table>
+</div>
+
+<h3>③ ターゲット</h3>
+<div class="tbl-wrap">
+<table>
+<tr><th>選択肢</th><th>対象</th></tr>
+<tr><td>コーチ・コンサルタント</td><td>ビジネス成長を目指すコーチ</td></tr>
+<tr><td>セラピスト・ヒーラー</td><td>ウェルネス業界の施術者</td></tr>
+<tr><td>先生・講師</td><td>教育業界のインストラクター</td></tr>
+<tr><td>経営者・起業家</td><td>ビジネスオーナー・スタートアップ</td></tr>
+<tr><td>占い師・スピリチュアル</td><td>スピリチュアルアドバイザー</td></tr>
+<tr><td>個人・一般</td><td>自己成長を求める一般の方</td></tr>
+</table>
+</div>
+
+<h3>④ ヘッドライン（英語・自動生成）</h3>
+<p>「雰囲気」×「ターゲット」の組み合わせ（36パターン）から英語のヘッドラインが自動生成されます。生成後、テキストフィールドで自由に編集できます。</p>
+
+<h3>⑤ CTA（Call To Action）</h3>
+<div class="tbl-wrap">
+<table>
+<tr><th>表示名</th><th>英語テキスト</th></tr>
+<tr><td>今すぐ始める</td><td>Get Started Now</td></tr>
+<tr><td>無料で受け取る</td><td>Get It Free</td></tr>
+<tr><td>詳しく見る</td><td>Learn More</td></tr>
+<tr><td>参加する</td><td>Join Now</td></tr>
+<tr><td>ダウンロードする</td><td>Download Now</td></tr>
+<tr><td>申し込む</td><td>Apply Today</td></tr>
+<tr><td>セッションを予約</td><td>Book Your Session</td></tr>
+<tr><td>席を確保する</td><td>Claim Your Spot</td></tr>
+</table>
+</div>
+
+<h3>⑥ 装飾スタイル</h3>
+<div class="tbl-wrap">
+<table>
+<tr><th>選択肢</th><th>内容</th></tr>
+<tr><td>グラデーション</td><td>グラデーションオーバーレイ、滑らかな色遷移</td></tr>
+<tr><td>幾何学模様</td><td>ジオメトリックパターン、角度のあるデザイン要素</td></tr>
+<tr><td>直線・ストライプ</td><td>直線、ボーダー、グリッド構造</td></tr>
+<tr><td>有機的・曲線</td><td>流れるような形状、自然なフォルム</td></tr>
+<tr><td>ドット・パーティクル</td><td>ドットパターン、散在する要素</td></tr>
+<tr><td>なし（シンプル）</td><td>装飾なし、テキスト重視のレイアウト</td></tr>
+</table>
+</div>
+
+<!-- 生成される4サイズ -->
+<h2>生成される4サイズ</h2>
+<p>プロンプトは以下の4サイズで同時に生成されます。各プロンプトにはCanva AIですぐ使えるテキストが含まれます。</p>
+
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin:20px 0">
+  <div class="size-card">
+    <div class="icon">🖥</div>
+    <div class="name">プレゼンテーション</div>
+    <div class="dim">1920×1080</div>
+    <div class="use">iMac / MacBook用</div>
+  </div>
+  <div class="size-card">
+    <div class="icon">📱</div>
+    <div class="name">ストーリー</div>
+    <div class="dim">1080×1920</div>
+    <div class="use">iPhone用</div>
+  </div>
+  <div class="size-card">
+    <div class="icon">📖</div>
+    <div class="name">ポスター</div>
+    <div class="dim">1200×1600</div>
+    <div class="use">iPad / E-Book用</div>
+  </div>
+  <div class="size-card">
+    <div class="icon">📸</div>
+    <div class="name">Instagram投稿</div>
+    <div class="dim">1080×1080</div>
+    <div class="use">CD / Instagram用</div>
+  </div>
+</div>
+
+<!-- Canvaでの使い方 -->
+<h2>Canva AIでの使い方</h2>
+<div class="steps">
+  <div class="step">
+    <div class="step-num">1</div>
+    <div class="step-body">
+      <h4>プロンプトをコピー</h4>
+      <p>生成されたプロンプトの「コピー」ボタンをクリック。または「全プロンプトをコピー」で4件すべてコピー。</p>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-num">2</div>
+    <div class="step-body">
+      <h4>Canvaでデザインを作成</h4>
+      <p>Canvaを開く → 「デザインを作成」→ プロンプトに記載のサイズ（例：1920×1080）でキャンバスを作成。</p>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-num">3</div>
+    <div class="step-body">
+      <h4>Canva AIに貼り付け → 生成</h4>
+      <p>Canvaの「Canva AI」機能を開く → コピーしたプロンプトを貼り付け → 「生成」ボタン → PNGでエクスポート。</p>
+    </div>
+  </div>
+</div>
+
+<div class="tip">💡 生成されたPNG画像をMockup Composerの「コンテンツ画像」としてアップロードすれば、対応するフレーム（iMac、iPhone等）にはめ込めます。フレーム一覧の推奨サイズと素材生成の4サイズが対応しています。</div>
+
+<!-- ワークフロー -->
+<h2>推奨ワークフロー</h2>
+<div class="feature">
+  <div class="feature-title"><span>🔁</span> LP → 素材生成 → Canva → Mockup Composer</div>
+  <p>
+    <strong>1.</strong> LPのスクリーンショットを撮る<br>
+    <strong>2.</strong> 素材生成ツールで配色取得＋プロンプト生成<br>
+    <strong>3.</strong> Canva AIでLP風のデザイン画像を4サイズ作成<br>
+    <strong>4.</strong> Mockup Composerでフレームに画像をはめ込み<br>
+    <strong>5.</strong> Exportしてセールスページに配置
+  </p>
+  <p>このサイクルで、LPの世界観と統一感のあるモックアップ画像が量産できます。</p>
+</div>
+
+<!-- Footer -->
+<div class="footer">
+  <p>BESTAD G.K.</p>
+  <p>&copy; 2026 BESTAD G.K. All Rights Reserved</p>
+</div>
+
+</div>
+</body>
+</html>
