@@ -11,6 +11,57 @@ const IS_FREE = true;
 let _id = 0;
 const uid = () => "f" + ++_id;
 
+// ===== 4-Point Perspective Transform (CSS matrix3d) =====
+function quadMatrix3d(w, h, pts) {
+  // Map rect (0,0)-(w,0)-(w,h)-(0,h) to quad pts[TL,TR,BR,BL]
+  var s = [[0, 0], [w, 0], [w, h], [0, h]];
+  var d = pts.map(function (p) {
+    return [p.x, p.y];
+  });
+  var A = [];
+  for (var i = 0; i < 4; i++) {
+    A.push([s[i][0], s[i][1], 1, 0, 0, 0, -d[i][0] * s[i][0], -d[i][0] * s[i][1], d[i][0]]);
+    A.push([0, 0, 0, s[i][0], s[i][1], 1, -d[i][1] * s[i][0], -d[i][1] * s[i][1], d[i][1]]);
+  }
+  var n = 8;
+  for (var c = 0; c < n; c++) {
+    var mr = c;
+    for (var r = c + 1; r < n; r++) {
+      if (Math.abs(A[r][c]) > Math.abs(A[mr][c])) mr = r;
+    }
+    var tmp = A[c];
+    A[c] = A[mr];
+    A[mr] = tmp;
+    if (Math.abs(A[c][c]) < 1e-10) return "none";
+    for (var r = c + 1; r < n; r++) {
+      var f = A[r][c] / A[c][c];
+      for (var j = c; j <= n; j++) A[r][j] -= f * A[c][j];
+    }
+  }
+  var x = new Array(n);
+  for (var i = n - 1; i >= 0; i--) {
+    x[i] = A[i][n];
+    for (var j = i + 1; j < n; j++) x[i] -= A[i][j] * x[j];
+    x[i] /= A[i][i];
+  }
+  return "matrix3d(" + x[0] + "," + x[3] + ",0," + x[6] + "," + x[1] + "," + x[4] + ",0," + x[7] + ",0,0,1,0," + x[2] + "," + x[5] + ",0,1)";
+}
+function rectToPts(sx, sy, sw, sh) {
+  return [{
+    x: sx,
+    y: sy
+  }, {
+    x: sx + sw,
+    y: sy
+  }, {
+    x: sx + sw,
+    y: sy + sh
+  }, {
+    x: sx,
+    y: sy + sh
+  }];
+}
+
 // ===== FRAME LIBRARY (persistent storage) =====
 // ===== BUILT-IN FRAMES =====
 const FRAME_BASE = "https://bestad-keizo.github.io/mc-free/frames/";
@@ -404,6 +455,7 @@ function createItem(overrides = {}) {
     screenY: 10,
     screenW: 180,
     screenH: 200,
+    screenPts: null,
     contentImage: null,
     contentFit: "cover",
     contentSkewX: 0,
@@ -486,8 +538,19 @@ function ItemRender({
       color: "#666",
       pointerEvents: "none"
     }
-  }, "\u30D5\u30EC\u30FC\u30E0\u306A\u3057"), /*#__PURE__*/React.createElement("div", {
-    style: {
+  }, "\u30D5\u30EC\u30FC\u30E0\u306A\u3057"), (() => {
+    const pts = d.screenPts;
+    const useQuad = pts && pts.length === 4;
+    const cStyle = useQuad ? {
+      position: "absolute",
+      left: 0,
+      top: 0,
+      width: d.screenW,
+      height: d.screenH,
+      zIndex: 2,
+      transformOrigin: "0 0",
+      transform: quadMatrix3d(d.screenW, d.screenH, pts)
+    } : {
       position: "absolute",
       left: d.screenX,
       top: d.screenY,
@@ -496,48 +559,51 @@ function ItemRender({
       zIndex: 2,
       transform: contentTransform,
       transformOrigin: "center center"
-    }
-  }, hasImg && /*#__PURE__*/React.createElement("img", {
-    src: d.contentImage,
-    style: {
-      width: "100%",
-      height: "100%",
-      objectFit: d.contentFit || "cover",
-      display: "block"
-    },
-    alt: ""
-  }), !hasImg && /*#__PURE__*/React.createElement("div", {
-    style: {
-      width: "100%",
-      height: "100%",
-      background: bg,
-      display: "flex",
-      flexDirection: "column",
-      alignItems: d.textAlign === "center" ? "center" : d.textAlign === "right" ? "flex-end" : "flex-start",
-      justifyContent: "center",
-      padding: 6,
-      textAlign: d.textAlign
-    }
-  }, d.title && /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontFamily: "Montserrat,sans-serif",
-      fontSize: d.titleSize,
-      fontWeight: 900,
-      color: d.titleColor,
-      lineHeight: 1.15,
-      wordBreak: "break-word",
-      whiteSpace: "pre-line"
-    }
-  }, d.title), d.subtitle && /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: d.subtitleSize,
-      fontWeight: 700,
-      color: d.subtitleColor,
-      marginTop: 3,
-      wordBreak: "break-word",
-      whiteSpace: "pre-line"
-    }
-  }, d.subtitle))), hasSpine && /*#__PURE__*/React.createElement("div", {
+    };
+    return /*#__PURE__*/React.createElement("div", {
+      style: cStyle
+    }, hasImg && /*#__PURE__*/React.createElement("img", {
+      src: d.contentImage,
+      style: {
+        width: "100%",
+        height: "100%",
+        objectFit: d.contentFit || "cover",
+        display: "block"
+      },
+      alt: ""
+    }), !hasImg && /*#__PURE__*/React.createElement("div", {
+      style: {
+        width: "100%",
+        height: "100%",
+        background: bg,
+        display: "flex",
+        flexDirection: "column",
+        alignItems: d.textAlign === "center" ? "center" : d.textAlign === "right" ? "flex-end" : "flex-start",
+        justifyContent: "center",
+        padding: 6,
+        textAlign: d.textAlign
+      }
+    }, d.title && /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontFamily: "Montserrat,sans-serif",
+        fontSize: d.titleSize,
+        fontWeight: 900,
+        color: d.titleColor,
+        lineHeight: 1.15,
+        wordBreak: "break-word",
+        whiteSpace: "pre-line"
+      }
+    }, d.title), d.subtitle && /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: d.subtitleSize,
+        fontWeight: 700,
+        color: d.subtitleColor,
+        marginTop: 3,
+        wordBreak: "break-word",
+        whiteSpace: "pre-line"
+      }
+    }, d.subtitle)));
+  })(), hasSpine && /*#__PURE__*/React.createElement("div", {
     style: {
       position: "absolute",
       left: d.spineX,
@@ -569,6 +635,8 @@ function ScreenAreaEditor({
   const startPos = useRef({});
   const ps = Math.min(220 / item.frameW, 220 / item.frameH, 1);
   const hasSpine = item.spineW > 0 && item.spineH > 0;
+  // Derive screenPts if not set
+  const pts = item.screenPts || rectToPts(item.screenX, item.screenY, item.screenW, item.screenH);
   const onDown = (e, mode) => {
     e.preventDefault();
     e.stopPropagation();
@@ -576,10 +644,12 @@ function ScreenAreaEditor({
     startPos.current = {
       mx: e.clientX,
       my: e.clientY,
-      sx: item.screenX,
-      sy: item.screenY,
-      sw: item.screenW,
-      sh: item.screenH,
+      pts: pts.map(function (p) {
+        return {
+          x: p.x,
+          y: p.y
+        };
+      }),
       spx: item.spineX,
       spy: item.spineY,
       spw: item.spineW,
@@ -588,42 +658,54 @@ function ScreenAreaEditor({
     const onMove = ev => {
       const dx = (ev.clientX - startPos.current.mx) / ps,
         dy = (ev.clientY - startPos.current.my) / ps;
-      const s = startPos.current;
-      if (dragging.current === "move") onUpdate(item.id, {
-        screenX: Math.round(s.sx + dx),
-        screenY: Math.round(s.sy + dy)
-      });else if (dragging.current === "corner-tl") onUpdate(item.id, {
-        screenX: Math.round(s.sx + dx),
-        screenY: Math.round(s.sy + dy),
-        screenW: Math.max(20, Math.round(s.sw - dx)),
-        screenH: Math.max(20, Math.round(s.sh - dy))
-      });else if (dragging.current === "corner-tr") onUpdate(item.id, {
-        screenY: Math.round(s.sy + dy),
-        screenW: Math.max(20, Math.round(s.sw + dx)),
-        screenH: Math.max(20, Math.round(s.sh - dy))
-      });else if (dragging.current === "corner-bl") onUpdate(item.id, {
-        screenX: Math.round(s.sx + dx),
-        screenW: Math.max(20, Math.round(s.sw - dx)),
-        screenH: Math.max(20, Math.round(s.sh + dy))
-      });else if (dragging.current === "corner-br") onUpdate(item.id, {
-        screenW: Math.max(20, Math.round(s.sw + dx)),
-        screenH: Math.max(20, Math.round(s.sh + dy))
-      });else if (dragging.current === "edge-top") onUpdate(item.id, {
-        screenY: Math.round(s.sy + dy),
-        screenH: Math.max(20, Math.round(s.sh - dy))
-      });else if (dragging.current === "edge-bottom") onUpdate(item.id, {
-        screenH: Math.max(20, Math.round(s.sh + dy))
-      });else if (dragging.current === "edge-left") onUpdate(item.id, {
-        screenX: Math.round(s.sx + dx),
-        screenW: Math.max(20, Math.round(s.sw - dx))
-      });else if (dragging.current === "edge-right") onUpdate(item.id, {
-        screenW: Math.max(20, Math.round(s.sw + dx))
-      });else if (dragging.current === "spine-move") onUpdate(item.id, {
-        spineX: Math.round(s.spx + dx),
-        spineY: Math.round(s.spy + dy)
-      });else if (dragging.current === "spine-resize") onUpdate(item.id, {
-        spineW: Math.max(5, Math.round(s.spw + dx)),
-        spineH: Math.max(20, Math.round(s.sph + dy))
+      const sp = startPos.current;
+      if (dragging.current === "spine-move") {
+        onUpdate(item.id, {
+          spineX: Math.round(sp.spx + dx),
+          spineY: Math.round(sp.spy + dy)
+        });
+        return;
+      }
+      if (dragging.current === "spine-resize") {
+        onUpdate(item.id, {
+          spineW: Math.max(5, Math.round(sp.spw + dx)),
+          spineH: Math.max(20, Math.round(sp.sph + dy))
+        });
+        return;
+      }
+      var np = sp.pts.map(function (p) {
+        return {
+          x: p.x,
+          y: p.y
+        };
+      });
+      if (dragging.current === "move-all") {
+        np = np.map(function (p) {
+          return {
+            x: Math.round(p.x + dx),
+            y: Math.round(p.y + dy)
+          };
+        });
+      } else {
+        var idx = parseInt(dragging.current.replace("pt", ""));
+        if (!isNaN(idx)) {
+          np[idx] = {
+            x: Math.round(sp.pts[idx].x + dx),
+            y: Math.round(sp.pts[idx].y + dy)
+          };
+        }
+      }
+      // Update screenPts and derive bounding box for screenW/H
+      var bx = Math.min(np[0].x, np[1].x, np[2].x, np[3].x);
+      var by = Math.min(np[0].y, np[1].y, np[2].y, np[3].y);
+      var bw = Math.max(np[0].x, np[1].x, np[2].x, np[3].x) - bx;
+      var bh = Math.max(np[0].y, np[1].y, np[2].y, np[3].y) - by;
+      onUpdate(item.id, {
+        screenPts: np,
+        screenX: bx,
+        screenY: by,
+        screenW: Math.max(20, bw),
+        screenH: Math.max(20, bh)
       });
     };
     const onUp = () => {
@@ -634,6 +716,11 @@ function ScreenAreaEditor({
     window.addEventListener("mousemove", onMove);
     window.addEventListener("mouseup", onUp);
   };
+
+  // SVG polygon for quad outline
+  const polyStr = pts.map(function (p) {
+    return p.x * ps + "," + p.y * ps;
+  }).join(" ");
   return /*#__PURE__*/React.createElement("div", {
     style: {
       background: "#0d1117",
@@ -649,7 +736,7 @@ function ScreenAreaEditor({
       color: "#f97316",
       marginBottom: 6
     }
-  }, "\uD83D\uDCD0 \u753B\u9762\u9818\u57DF\uFF08\u30C9\u30E9\u30C3\u30B0\u3067\u8ABF\u6574\uFF09"), /*#__PURE__*/React.createElement("div", {
+  }, "\uD83D\uDCD0 \u753B\u9762\u9818\u57DF\uFF084\u70B9\u30C9\u30E9\u30C3\u30B0\uFF09"), /*#__PURE__*/React.createElement("div", {
     style: {
       padding: "8px 0"
     }
@@ -671,128 +758,61 @@ function ScreenAreaEditor({
       borderRadius: 8
     },
     alt: ""
-  }), /*#__PURE__*/React.createElement("div", {
-    onMouseDown: e => onDown(e, "move"),
+  }), /*#__PURE__*/React.createElement("svg", {
     style: {
       position: "absolute",
-      left: item.screenX * ps,
-      top: item.screenY * ps,
-      width: item.screenW * ps,
-      height: item.screenH * ps,
-      border: "2px solid #f97316",
-      background: "rgba(249,115,22,.15)",
-      cursor: "move",
-      borderRadius: 2
+      top: 0,
+      left: 0,
+      width: "100%",
+      height: "100%",
+      pointerEvents: "none"
     }
-  }, /*#__PURE__*/React.createElement("div", {
+  }, /*#__PURE__*/React.createElement("polygon", {
+    points: polyStr,
+    fill: "rgba(249,115,22,.12)",
+    stroke: "#f97316",
+    strokeWidth: "2"
+  })), /*#__PURE__*/React.createElement("div", {
+    onMouseDown: e => onDown(e, "move-all"),
     style: {
       position: "absolute",
-      top: 2,
-      left: 4,
-      fontSize: 9,
-      color: "#f97316"
+      top: 0,
+      left: 0,
+      width: "100%",
+      height: "100%",
+      cursor: "move"
     }
-  }, "\u8868\u7D19"), /*#__PURE__*/React.createElement("div", {
-    onMouseDown: e => onDown(e, "corner-tl"),
-    style: {
-      position: "absolute",
-      top: -5,
-      left: -5,
-      width: 10,
-      height: 10,
-      background: "#f97316",
-      borderRadius: 2,
-      cursor: "nwse-resize"
-    }
-  }), /*#__PURE__*/React.createElement("div", {
-    onMouseDown: e => onDown(e, "corner-tr"),
-    style: {
-      position: "absolute",
-      top: -5,
-      right: -5,
-      width: 10,
-      height: 10,
-      background: "#f97316",
-      borderRadius: 2,
-      cursor: "nesw-resize"
-    }
-  }), /*#__PURE__*/React.createElement("div", {
-    onMouseDown: e => onDown(e, "corner-bl"),
-    style: {
-      position: "absolute",
-      bottom: -5,
-      left: -5,
-      width: 10,
-      height: 10,
-      background: "#f97316",
-      borderRadius: 2,
-      cursor: "nesw-resize"
-    }
-  }), /*#__PURE__*/React.createElement("div", {
-    onMouseDown: e => onDown(e, "corner-br"),
-    style: {
-      position: "absolute",
-      bottom: -5,
-      right: -5,
-      width: 10,
-      height: 10,
-      background: "#f97316",
-      borderRadius: 2,
-      cursor: "nwse-resize"
-    }
-  }), /*#__PURE__*/React.createElement("div", {
-    onMouseDown: e => onDown(e, "edge-top"),
-    style: {
-      position: "absolute",
-      top: -4,
-      left: "50%",
-      transform: "translateX(-50%)",
-      width: 16,
-      height: 6,
-      background: "#fb923c",
-      borderRadius: 1,
-      cursor: "ns-resize"
-    }
-  }), /*#__PURE__*/React.createElement("div", {
-    onMouseDown: e => onDown(e, "edge-bottom"),
-    style: {
-      position: "absolute",
-      bottom: -4,
-      left: "50%",
-      transform: "translateX(-50%)",
-      width: 16,
-      height: 6,
-      background: "#fb923c",
-      borderRadius: 1,
-      cursor: "ns-resize"
-    }
-  }), /*#__PURE__*/React.createElement("div", {
-    onMouseDown: e => onDown(e, "edge-left"),
-    style: {
-      position: "absolute",
-      left: -4,
-      top: "50%",
-      transform: "translateY(-50%)",
-      width: 6,
-      height: 16,
-      background: "#fb923c",
-      borderRadius: 1,
-      cursor: "ew-resize"
-    }
-  }), /*#__PURE__*/React.createElement("div", {
-    onMouseDown: e => onDown(e, "edge-right"),
-    style: {
-      position: "absolute",
-      right: -4,
-      top: "50%",
-      transform: "translateY(-50%)",
-      width: 6,
-      height: 16,
-      background: "#fb923c",
-      borderRadius: 1,
-      cursor: "ew-resize"
-    }
-  })), hasSpine && /*#__PURE__*/React.createElement("div", {
+  }), pts.map(function (p, i) {
+    var labels = ["TL", "TR", "BR", "BL"];
+    return /*#__PURE__*/React.createElement("div", {
+      key: i,
+      onMouseDown: function (e) {
+        onDown(e, "pt" + i);
+      },
+      style: {
+        position: "absolute",
+        left: p.x * ps - 6,
+        top: p.y * ps - 6,
+        width: 12,
+        height: 12,
+        background: "#f97316",
+        borderRadius: "50%",
+        cursor: "crosshair",
+        border: "2px solid #fff",
+        zIndex: 10
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        position: "absolute",
+        top: -14,
+        left: "50%",
+        transform: "translateX(-50%)",
+        fontSize: 7,
+        color: "#f97316",
+        whiteSpace: "nowrap"
+      }
+    }, labels[i]));
+  }), hasSpine && /*#__PURE__*/React.createElement("div", {
     onMouseDown: e => onDown(e, "spine-move"),
     style: {
       position: "absolute",
@@ -803,7 +823,8 @@ function ScreenAreaEditor({
       border: "2px solid #a855f7",
       background: "rgba(168,85,247,.2)",
       cursor: "move",
-      borderRadius: 2
+      borderRadius: 2,
+      zIndex: 5
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
@@ -833,30 +854,20 @@ function ScreenAreaEditor({
       gap: 3,
       marginTop: 6
     }
-  }, [["X", "screenX"], ["Y", "screenY"], ["幅", "screenW"], ["高", "screenH"]].map(([l, k]) => /*#__PURE__*/React.createElement("div", {
-    key: k
-  }, /*#__PURE__*/React.createElement("label", {
-    style: {
-      fontSize: 9,
-      color: "#f97316"
-    }
-  }, l), /*#__PURE__*/React.createElement("input", {
-    type: "number",
-    value: item[k],
-    onChange: e => onUpdate(item.id, {
-      [k]: +e.target.value
-    }),
-    style: {
-      width: "100%",
-      padding: "3px 5px",
-      background: "#161b26",
-      border: "1px solid #2a3040",
-      borderRadius: 3,
-      color: "#e4e4e7",
-      fontSize: 12,
-      outline: "none"
-    }
-  })))), hasSpine && /*#__PURE__*/React.createElement("div", {
+  }, ["TL", "TR", "BR", "BL"].map(function (label, i) {
+    return /*#__PURE__*/React.createElement("div", {
+      key: i,
+      style: {
+        fontSize: 8,
+        color: "#f97316",
+        textAlign: "center"
+      }
+    }, /*#__PURE__*/React.createElement("div", null, label), /*#__PURE__*/React.createElement("div", {
+      style: {
+        color: "#999"
+      }
+    }, pts[i].x, ",", pts[i].y));
+  })), hasSpine && /*#__PURE__*/React.createElement("div", {
     style: {
       display: "grid",
       gridTemplateColumns: "1fr 1fr 1fr 1fr",
@@ -1284,6 +1295,7 @@ function Editor({
           upd.screenY = preset.sy;
           upd.screenW = preset.sw;
           upd.screenH = preset.sh;
+          upd.screenPts = rectToPts(preset.sx, preset.sy, preset.sw, preset.sh);
         }
         const spine = SPINE_PRESETS[f.id];
         if (spine) {
@@ -1360,6 +1372,7 @@ function Editor({
           upd.screenY = preset.sy;
           upd.screenW = preset.sw;
           upd.screenH = preset.sh;
+          upd.screenPts = rectToPts(preset.sx, preset.sy, preset.sw, preset.sh);
         }
         const spine = SPINE_PRESETS[f.id];
         if (spine) {
@@ -4024,7 +4037,8 @@ function App() {
         screenX: p.sx,
         screenY: p.sy,
         screenW: p.sw,
-        screenH: p.sh
+        screenH: p.sh,
+        screenPts: rectToPts(p.sx, p.sy, p.sw, p.sh)
       });
     };
     var newItems = [];
