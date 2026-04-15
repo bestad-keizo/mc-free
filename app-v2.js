@@ -5324,22 +5324,25 @@ function App() {
     }
   }, [{
     icon: "🖥",
-    name: "iMac"
-  }, {
-    icon: "💻",
-    name: "MacBook"
-  }, {
-    icon: "📱",
-    name: "iPhone"
-  }, {
-    icon: "📖",
-    name: "E-Book"
+    name: "デバイス"
   }, {
     icon: "📦",
-    name: "3Dボックス"
+    name: "ボックス"
   }, {
-    icon: "🏆",
-    name: "修了証書"
+    icon: "📄",
+    name: "ドキュメント"
+  }, {
+    icon: "✅",
+    name: "チェックリスト"
+  }, {
+    icon: "📖",
+    name: "書籍・メディア"
+  }, {
+    icon: "🏅",
+    name: "認定証"
+  }, {
+    icon: "🎖",
+    name: "デコレーション"
   }].map(function (f, i) {
     return /*#__PURE__*/React.createElement("div", {
       key: i,

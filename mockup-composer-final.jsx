@@ -1822,12 +1822,13 @@ export default function App() {
           {/* DEMO VISUAL */}
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10, marginBottom: 32 }}>
             {[
-              { icon: "🖥", name: "iMac" },
-              { icon: "💻", name: "MacBook" },
-              { icon: "📱", name: "iPhone" },
-              { icon: "📖", name: "E-Book" },
-              { icon: "📦", name: "3Dボックス" },
-              { icon: "🏆", name: "修了証書" },
+              { icon: "🖥", name: "デバイス" },
+              { icon: "📦", name: "ボックス" },
+              { icon: "📄", name: "ドキュメント" },
+              { icon: "✅", name: "チェックリスト" },
+              { icon: "📖", name: "書籍・メディア" },
+              { icon: "🏅", name: "認定証" },
+              { icon: "🎖", name: "デコレーション" },
             ].map(function(f,i){return <div key={i} style={{ background: "rgba(255,255,255,.03)", borderRadius: 12, padding: "16px 8px", textAlign: "center", border: "1px solid rgba(255,255,255,.06)" }}>
               <div style={{ fontSize: 28, marginBottom: 4 }}>{f.icon}</div>
               <div style={{ fontSize: 11, color: "#94a3b8", fontWeight: 600 }}>{f.name}</div>
