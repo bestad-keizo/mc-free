@@ -5317,10 +5317,14 @@ function App() {
     }
   }, "\u30C7\u30B6\u30A4\u30F3\u30B9\u30AD\u30EB\u4E0D\u8981\u3002\u30D6\u30E9\u30A6\u30B6\u3060\u3051\u3067\u5B8C\u7D50\u3002")), /*#__PURE__*/React.createElement("div", {
     style: {
-      display: "grid",
-      gridTemplateColumns: "1fr 1fr 1fr",
-      gap: 10,
       marginBottom: 32
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "grid",
+      gridTemplateColumns: "1fr 1fr 1fr 1fr",
+      gap: 10,
+      marginBottom: 10
     }
   }, [{
     icon: "🖥",
@@ -5334,7 +5338,35 @@ function App() {
   }, {
     icon: "✅",
     name: "チェックリスト"
-  }, {
+  }].map(function (f, i) {
+    return /*#__PURE__*/React.createElement("div", {
+      key: i,
+      style: {
+        background: "rgba(255,255,255,.03)",
+        borderRadius: 12,
+        padding: "16px 8px",
+        textAlign: "center",
+        border: "1px solid rgba(255,255,255,.06)"
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: 24,
+        marginBottom: 4
+      }
+    }, f.icon), /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: 10,
+        color: "#94a3b8",
+        fontWeight: 600
+      }
+    }, f.name));
+  })), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "grid",
+      gridTemplateColumns: "1fr 1fr 1fr",
+      gap: 10
+    }
+  }, [{
     icon: "📖",
     name: "書籍・メディア"
   }, {
@@ -5355,17 +5387,17 @@ function App() {
       }
     }, /*#__PURE__*/React.createElement("div", {
       style: {
-        fontSize: 28,
+        fontSize: 24,
         marginBottom: 4
       }
     }, f.icon), /*#__PURE__*/React.createElement("div", {
       style: {
-        fontSize: 11,
+        fontSize: 10,
         color: "#94a3b8",
         fontWeight: 600
       }
     }, f.name));
-  })), /*#__PURE__*/React.createElement("div", {
+  }))), /*#__PURE__*/React.createElement("div", {
     style: {
       marginBottom: 32
     }
