@@ -13,18 +13,339 @@ const uid = () => "f" + ++_id;
 
 // ===== FRAME LIBRARY (persistent storage) =====
 // ===== BUILT-IN FRAMES =====
-const BUILTIN_FRAMES = [
-  // フレーム画像はGitHub Pages上の個別PNGファイルからURL参照で読み込む
-  // 例: { id: "builtin-imac", name: "iMac", url: "https://bestad-keizo.github.io/mc-free/frames/imac.png" }
-  // 1080x1080px PNG、透過背景
-];
+const FRAME_BASE = "https://bestad-keizo.github.io/mc-free/frames/";
+const FRAME_CATS = [{
+  key: "device",
+  label: "デバイス"
+}, {
+  key: "box",
+  label: "ボックス"
+}, {
+  key: "doc",
+  label: "ドキュメント"
+}, {
+  key: "check",
+  label: "チェックリスト"
+}, {
+  key: "media",
+  label: "書籍・メディア"
+}, {
+  key: "cert",
+  label: "認定証"
+}, {
+  key: "deco",
+  label: "デコレーション"
+}];
+const BUILTIN_FRAMES = [{
+  id: "builtin-imacb",
+  name: "iMac",
+  url: FRAME_BASE + "imacb.png",
+  cat: "device"
+}, {
+  id: "builtin-imac",
+  name: "iMac クラシック",
+  url: FRAME_BASE + "imac.png",
+  cat: "device"
+}, {
+  id: "builtin-macbook",
+  name: "MacBook",
+  url: FRAME_BASE + "macbook.png",
+  cat: "device"
+}, {
+  id: "builtin-ipad",
+  name: "iPad",
+  url: FRAME_BASE + "ipad.png",
+  cat: "device"
+}, {
+  id: "builtin-iphone",
+  name: "iPhone",
+  url: FRAME_BASE + "iphone.png",
+  cat: "device"
+}, {
+  id: "builtin-iphone-y",
+  name: "iPhone 斜め横",
+  url: FRAME_BASE + "iphone-y.png",
+  cat: "device"
+}, {
+  id: "builtin-iphone-z",
+  name: "iPhone 斜め縦",
+  url: FRAME_BASE + "iphone-z.png",
+  cat: "device"
+}, {
+  id: "builtin-box1l",
+  name: "厚ボックス左",
+  url: FRAME_BASE + "box1l.png",
+  cat: "box"
+}, {
+  id: "builtin-box1r",
+  name: "厚ボックス右",
+  url: FRAME_BASE + "box1r.png",
+  cat: "box"
+}, {
+  id: "builtin-box2l",
+  name: "薄ボックス左",
+  url: FRAME_BASE + "box2l.png",
+  cat: "box"
+}, {
+  id: "builtin-box2r",
+  name: "薄ボックス右",
+  url: FRAME_BASE + "box2r.png",
+  cat: "box"
+}, {
+  id: "builtin-a4file1",
+  name: "A4用紙",
+  url: FRAME_BASE + "a4file1.png",
+  cat: "doc"
+}, {
+  id: "builtin-a4file2",
+  name: "A4ファイル",
+  url: FRAME_BASE + "a4file2.png",
+  cat: "doc"
+}, {
+  id: "builtin-memo",
+  name: "メモ冊子",
+  url: FRAME_BASE + "memo.png",
+  cat: "doc"
+}, {
+  id: "builtin-card",
+  name: "カード",
+  url: FRAME_BASE + "card.png",
+  cat: "doc"
+}, {
+  id: "builtin-envelope",
+  name: "封筒",
+  url: FRAME_BASE + "envelope.png",
+  cat: "doc"
+}, {
+  id: "builtin-checklist-tate",
+  name: "チェックリスト縦",
+  url: FRAME_BASE + "checklist-tate.png",
+  cat: "check"
+}, {
+  id: "builtin-checklist-yoko",
+  name: "チェックリスト横",
+  url: FRAME_BASE + "checklist-yoko.png",
+  cat: "check"
+}, {
+  id: "builtin-ebook",
+  name: "E-Book",
+  url: FRAME_BASE + "ebook.png",
+  cat: "media"
+}, {
+  id: "builtin-cdcase",
+  name: "CDケース",
+  url: FRAME_BASE + "cdcase.png",
+  cat: "media"
+}, {
+  id: "builtin-journal",
+  name: "ジャーナル",
+  url: FRAME_BASE + "journal.png",
+  cat: "media"
+}, {
+  id: "builtin-cert",
+  name: "修了証書",
+  url: FRAME_BASE + "cert.png",
+  cat: "cert"
+}, {
+  id: "builtin-deco-medal-red",
+  name: "メダル赤",
+  url: FRAME_BASE + "deco-medal-red.png",
+  cat: "deco"
+}, {
+  id: "builtin-deco-best",
+  name: "BESTメダル",
+  url: FRAME_BASE + "deco-best.png",
+  cat: "deco"
+}, {
+  id: "builtin-deco-bonus",
+  name: "Bonusスタンプ",
+  url: FRAME_BASE + "deco-bonus.png",
+  cat: "deco"
+}, {
+  id: "builtin-deco-lion",
+  name: "ライオンメダル",
+  url: FRAME_BASE + "deco-lion.png",
+  cat: "deco"
+}, {
+  id: "builtin-deco-secret",
+  name: "Secretスタンプ",
+  url: FRAME_BASE + "deco-secret.png",
+  cat: "deco"
+}, {
+  id: "builtin-deco-certified",
+  name: "Certifiedバッジ",
+  url: FRAME_BASE + "deco-certified.png",
+  cat: "deco"
+}, {
+  id: "builtin-deco-pen",
+  name: "ペン",
+  url: FRAME_BASE + "deco-pen.png",
+  cat: "deco"
+}, {
+  id: "builtin-deco-airpods",
+  name: "AirPods",
+  url: FRAME_BASE + "deco-airpods.png",
+  cat: "deco"
+}];
 const SCREEN_PRESETS = {
-  // 1080x1080基準の画面領域座標
-  // 例: "builtin-imac": { sx: 148, sy: 220, sw: 799, sh: 475 },
+  "builtin-imacb": {
+    sx: 38,
+    sy: 84,
+    sw: 324,
+    sh: 284
+  },
+  "builtin-imac": {
+    sx: 35,
+    sy: 70,
+    sw: 330,
+    sh: 200
+  },
+  "builtin-macbook": {
+    sx: 14,
+    sy: 85,
+    sw: 371,
+    sh: 230
+  },
+  "builtin-ipad": {
+    sx: 61,
+    sy: 21,
+    sw: 275,
+    sh: 365
+  },
+  "builtin-iphone": {
+    sx: 113,
+    sy: 40,
+    sw: 174,
+    sh: 320
+  },
+  "builtin-iphone-y": {
+    sx: 36,
+    sy: 55,
+    sw: 271,
+    sh: 304
+  },
+  "builtin-iphone-z": {
+    sx: 154,
+    sy: 30,
+    sw: 125,
+    sh: 330
+  },
+  "builtin-box1l": {
+    sx: 121,
+    sy: 19,
+    sw: 213,
+    sh: 351
+  },
+  "builtin-box1r": {
+    sx: 66,
+    sy: 19,
+    sw: 213,
+    sh: 351
+  },
+  "builtin-box2l": {
+    sx: 121,
+    sy: 19,
+    sw: 207,
+    sh: 347
+  },
+  "builtin-box2r": {
+    sx: 66,
+    sy: 19,
+    sw: 213,
+    sh: 297
+  },
+  "builtin-a4file1": {
+    sx: 81,
+    sy: 18,
+    sw: 239,
+    sh: 355
+  },
+  "builtin-a4file2": {
+    sx: 57,
+    sy: 24,
+    sw: 279,
+    sh: 350
+  },
+  "builtin-memo": {
+    sx: 46,
+    sy: 17,
+    sw: 306,
+    sh: 353
+  },
+  "builtin-card": {
+    sx: 25,
+    sy: 113,
+    sw: 315,
+    sh: 200
+  },
+  "builtin-envelope": {
+    sx: 20,
+    sy: 97,
+    sw: 347,
+    sh: 255
+  },
+  "builtin-checklist-tate": {
+    sx: 74,
+    sy: 27,
+    sw: 246,
+    sh: 354
+  },
+  "builtin-checklist-yoko": {
+    sx: 19,
+    sy: 73,
+    sw: 362,
+    sh: 266
+  },
+  "builtin-ebook": {
+    sx: 21,
+    sy: 12,
+    sw: 348,
+    sh: 364
+  },
+  "builtin-cdcase": {
+    sx: 32,
+    sy: 69,
+    sw: 322,
+    sh: 276
+  },
+  "builtin-journal": {
+    sx: 40,
+    sy: 58,
+    sw: 311,
+    sh: 273
+  },
+  "builtin-cert": {
+    sx: 40,
+    sy: 97,
+    sw: 319,
+    sh: 205
+  }
 };
 const SPINE_PRESETS = {
-  // 背表紙がある場合の座標（1080x1080基準）
-  // 例: "builtin-box-thick": { sx: 137, sy: 137, sw: 90, sh: 842 },
+  "builtin-box1l": {
+    sx: 66,
+    sy: 19,
+    sw: 54,
+    sh: 351
+  },
+  "builtin-box1r": {
+    sx: 279,
+    sy: 19,
+    sw: 54,
+    sh: 351
+  },
+  "builtin-box2l": {
+    sx: 84,
+    sy: 19,
+    sw: 37,
+    sh: 347
+  },
+  "builtin-box2r": {
+    sx: 279,
+    sy: 19,
+    sw: 37,
+    sh: 297
+  }
 };
 function useFrameLibrary() {
   const [savedFrames, setSavedFrames] = useState([]);
@@ -716,6 +1037,7 @@ function Editor({
   };
   const [saveName, setSaveName] = useState("");
   const [showSave, setShowSave] = useState(false);
+  const [frameCat, setFrameCat] = useState("device");
   return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
     style: {
       display: "flex",
@@ -796,7 +1118,96 @@ function Editor({
       fontSize: 10,
       fontWeight: 800
     }
-  }, "1"), "\u30D5\u30EC\u30FC\u30E0\u753B\u50CF"), frameLib.frames.length > 0 && /*#__PURE__*/React.createElement("div", {
+  }, "1"), "\u30D5\u30EC\u30FC\u30E0\u753B\u50CF"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginBottom: 8
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: 2,
+      flexWrap: "wrap",
+      marginBottom: 5
+    }
+  }, FRAME_CATS.map(c => /*#__PURE__*/React.createElement("button", {
+    key: c.key,
+    onClick: () => setFrameCat(c.key),
+    style: {
+      fontSize: 9,
+      padding: "3px 7px",
+      borderRadius: 5,
+      cursor: "pointer",
+      border: "none",
+      background: frameCat === c.key ? "#f97316" : "#1e2636",
+      color: frameCat === c.key ? "#fff" : "#999",
+      fontWeight: frameCat === c.key ? 700 : 400
+    }
+  }, c.label))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: 4,
+      flexWrap: "wrap"
+    }
+  }, BUILTIN_FRAMES.filter(f => f.cat === frameCat).map(f => /*#__PURE__*/React.createElement("div", {
+    key: f.id,
+    style: {
+      cursor: "pointer"
+    },
+    onClick: () => {
+      const img = new Image();
+      img.onload = () => {
+        const s = img.naturalWidth > 400 ? 400 / img.naturalWidth : 1;
+        const upd = {
+          frameUrl: f.url,
+          frameW: Math.round(img.naturalWidth * s),
+          frameH: Math.round(img.naturalHeight * s)
+        };
+        const preset = SCREEN_PRESETS[f.id];
+        if (preset) {
+          upd.screenX = preset.sx;
+          upd.screenY = preset.sy;
+          upd.screenW = preset.sw;
+          upd.screenH = preset.sh;
+        }
+        const spine = SPINE_PRESETS[f.id];
+        if (spine) {
+          upd.spineX = spine.sx;
+          upd.spineY = spine.sy;
+          upd.spineW = spine.sw;
+          upd.spineH = spine.sh;
+        } else {
+          upd.spineW = 0;
+          upd.spineH = 0;
+          upd.spineImage = null;
+        }
+        onUpdate(item.id, upd);
+      };
+      img.src = f.url;
+    }
+  }, /*#__PURE__*/React.createElement("img", {
+    src: f.url,
+    style: {
+      width: 52,
+      height: 52,
+      objectFit: "contain",
+      borderRadius: 8,
+      border: item.frameUrl === f.url ? "2px solid #f97316" : "1px solid #333",
+      background: "#0d1117",
+      padding: 2
+    },
+    alt: f.name
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 8,
+      color: "#888",
+      textAlign: "center",
+      marginTop: 1,
+      maxWidth: 52,
+      overflow: "hidden",
+      textOverflow: "ellipsis",
+      whiteSpace: "nowrap"
+    }
+  }, f.name))))), frameLib.frames.filter(f => !String(f.id).startsWith("builtin")).length > 0 && /*#__PURE__*/React.createElement("div", {
     style: {
       marginBottom: 8
     }
@@ -812,7 +1223,7 @@ function Editor({
       gap: 4,
       flexWrap: "wrap"
     }
-  }, frameLib.frames.map(f => /*#__PURE__*/React.createElement("div", {
+  }, frameLib.frames.filter(f => !String(f.id).startsWith("builtin")).map(f => /*#__PURE__*/React.createElement("div", {
     key: f.id,
     style: {
       position: "relative",
@@ -3504,11 +3915,11 @@ function App() {
     if (tpl === "stack3") {
       newItems = [mk("builtin-macbook", "MacBook", 380, 120, 1.0, 0), mk("builtin-ebook", "E-Book", 120, 300, 0.55, 10), mk("builtin-iphone", "iPhone", 860, 280, 0.5, -8)];
     } else if (tpl === "pair") {
-      newItems = [mk("builtin-imac", "iMac", 350, 100, 1.1, 0), mk("builtin-ipad", "iPad", 750, 320, 0.6, 10)];
+      newItems = [mk("builtin-imacb", "iMac", 350, 100, 1.1, 0), mk("builtin-ipad", "iPad", 750, 320, 0.6, 10)];
     } else if (tpl === "stack5") {
-      newItems = [mk("builtin-imac", "iMac", 320, 40, 1.0, 0), mk("builtin-macbook", "MacBook", 100, 380, 0.55, 10), mk("builtin-ebook", "E-Book", 620, 300, 0.5, -5), mk("builtin-dvd", "DVD", 800, 320, 0.45, 8), mk("builtin-iphone", "iPhone", 500, 400, 0.42, -3)];
+      newItems = [mk("builtin-imacb", "iMac", 320, 40, 1.0, 0), mk("builtin-macbook", "MacBook", 100, 380, 0.55, 10), mk("builtin-ebook", "E-Book", 620, 300, 0.5, -5), mk("builtin-cdcase", "CD", 800, 320, 0.45, 8), mk("builtin-iphone", "iPhone", 500, 400, 0.42, -3)];
     } else if (tpl === "single") {
-      newItems = [mk("builtin-imac", "iMac", 350, 120, 1.2, 0)];
+      newItems = [mk("builtin-imacb", "iMac", 350, 120, 1.2, 0)];
     }
     if (newItems.length > 0) {
       setItems(prev => [...prev, ...newItems]);
@@ -4140,7 +4551,7 @@ function App() {
       textAlign: "left",
       fontFamily: "inherit"
     }
-  }, "\uD83D\uDCBB \u5358\u54C1\uFF08MacBook\uFF09"), /*#__PURE__*/React.createElement("button", {
+  }, "\uD83D\uDCBB \u5358\u54C1\uFF08iMac\uFF09"), /*#__PURE__*/React.createElement("button", {
     onClick: function () {
       applyTemplate("pair");
       setShowTpl(false);
