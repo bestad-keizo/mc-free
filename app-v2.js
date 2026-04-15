@@ -465,6 +465,7 @@ function createItem(overrides = {}) {
     spineY: 0,
     spineW: 0,
     spineH: 0,
+    spinePts: null,
     spineImage: null,
     spineSkewX: 0,
     spineSkewY: 0,
@@ -603,8 +604,19 @@ function ItemRender({
         whiteSpace: "pre-line"
       }
     }, d.subtitle)));
-  })(), hasSpine && /*#__PURE__*/React.createElement("div", {
-    style: {
+  })(), hasSpine && (() => {
+    const sp = d.spinePts;
+    const useQuadSp = sp && sp.length === 4;
+    const spStyle = useQuadSp ? {
+      position: "absolute",
+      left: 0,
+      top: 0,
+      width: d.spineW,
+      height: d.spineH,
+      zIndex: 3,
+      transformOrigin: "0 0",
+      transform: quadMatrix3d(d.spineW, d.spineH, sp)
+    } : {
       position: "absolute",
       left: d.spineX,
       top: d.spineY,
@@ -613,17 +625,20 @@ function ItemRender({
       zIndex: 3,
       transform: spineTransform,
       transformOrigin: "center center"
-    }
-  }, /*#__PURE__*/React.createElement("img", {
-    src: d.spineImage,
-    style: {
-      width: "100%",
-      height: "100%",
-      objectFit: "cover",
-      display: "block"
-    },
-    alt: ""
-  })));
+    };
+    return /*#__PURE__*/React.createElement("div", {
+      style: spStyle
+    }, /*#__PURE__*/React.createElement("img", {
+      src: d.spineImage,
+      style: {
+        width: "100%",
+        height: "100%",
+        objectFit: "cover",
+        display: "block"
+      },
+      alt: ""
+    }));
+  })());
 }
 
 // ===== SCREEN AREA EDITOR =====
@@ -907,8 +922,8 @@ function SpineAreaEditor({
 }) {
   const dragging = useRef(null);
   const startPos = useRef({});
-  // フレーム全体の縮小率（最大180px幅）
   const ps = Math.min(180 / item.frameW, 180 / item.frameH, 1);
+  const pts = item.spinePts || rectToPts(item.spineX, item.spineY, item.spineW, item.spineH);
   const onDown = (e, mode) => {
     e.preventDefault();
     e.stopPropagation();
@@ -916,21 +931,49 @@ function SpineAreaEditor({
     startPos.current = {
       mx: e.clientX,
       my: e.clientY,
-      spx: item.spineX,
-      spy: item.spineY,
-      spw: item.spineW,
-      sph: item.spineH
+      pts: pts.map(function (p) {
+        return {
+          x: p.x,
+          y: p.y
+        };
+      })
     };
     const onMove = ev => {
       const dx = (ev.clientX - startPos.current.mx) / ps,
         dy = (ev.clientY - startPos.current.my) / ps;
-      if (dragging.current === "move") onUpdate(item.id, {
-        spineX: Math.round(startPos.current.spx + dx),
-        spineY: Math.round(startPos.current.spy + dy)
+      const sp = startPos.current;
+      var np = sp.pts.map(function (p) {
+        return {
+          x: p.x,
+          y: p.y
+        };
       });
-      if (dragging.current === "resize") onUpdate(item.id, {
-        spineW: Math.max(5, Math.round(startPos.current.spw + dx)),
-        spineH: Math.max(10, Math.round(startPos.current.sph + dy))
+      if (dragging.current === "move-all") {
+        np = np.map(function (p) {
+          return {
+            x: Math.round(p.x + dx),
+            y: Math.round(p.y + dy)
+          };
+        });
+      } else {
+        var idx = parseInt(dragging.current.replace("spt", ""));
+        if (!isNaN(idx)) {
+          np[idx] = {
+            x: Math.round(sp.pts[idx].x + dx),
+            y: Math.round(sp.pts[idx].y + dy)
+          };
+        }
+      }
+      var bx = Math.min(np[0].x, np[1].x, np[2].x, np[3].x);
+      var by = Math.min(np[0].y, np[1].y, np[2].y, np[3].y);
+      var bw = Math.max(np[0].x, np[1].x, np[2].x, np[3].x) - bx;
+      var bh = Math.max(np[0].y, np[1].y, np[2].y, np[3].y) - by;
+      onUpdate(item.id, {
+        spinePts: np,
+        spineX: bx,
+        spineY: by,
+        spineW: Math.max(5, bw),
+        spineH: Math.max(10, bh)
       });
     };
     const onUp = () => {
@@ -941,6 +984,14 @@ function SpineAreaEditor({
     window.addEventListener("mousemove", onMove);
     window.addEventListener("mouseup", onUp);
   };
+  const polyStr = pts.map(function (p) {
+    return p.x * ps + "," + p.y * ps;
+  }).join(" ");
+  // 表紙の参考表示用
+  const coverPts = item.screenPts || rectToPts(item.screenX, item.screenY, item.screenW, item.screenH);
+  const coverPolyStr = coverPts.map(function (p) {
+    return p.x * ps + "," + p.y * ps;
+  }).join(" ");
   return /*#__PURE__*/React.createElement("div", {
     style: {
       background: "#110d1a",
@@ -956,109 +1007,103 @@ function SpineAreaEditor({
       color: "#a855f7",
       marginBottom: 5
     }
-  }, "\uD83D\uDCD0 \u80CC\u8868\u7D19\u306E\u753B\u9762\u9818\u57DF\uFF08\u30C9\u30E9\u30C3\u30B0\u3067\u8ABF\u6574\uFF09"), /*#__PURE__*/React.createElement("div", {
+  }, "\uD83D\uDCD0 \u80CC\u8868\u7D19\uFF084\u70B9\u30C9\u30E9\u30C3\u30B0\uFF09"), /*#__PURE__*/React.createElement("div", {
     style: {
       position: "relative",
       width: item.frameW * ps,
       height: item.frameH * ps,
       margin: "0 auto",
       background: "#1a1a2e",
-      borderRadius: 6,
-      overflow: "hidden"
+      borderRadius: 6
     }
   }, item.frameUrl && /*#__PURE__*/React.createElement("img", {
     src: item.frameUrl,
     style: {
       width: "100%",
       height: "100%",
-      opacity: 0.5
+      opacity: 0.5,
+      borderRadius: 6
     },
     alt: ""
-  }), /*#__PURE__*/React.createElement("div", {
+  }), /*#__PURE__*/React.createElement("svg", {
     style: {
       position: "absolute",
-      left: item.screenX * ps,
-      top: item.screenY * ps,
-      width: item.screenW * ps,
-      height: item.screenH * ps,
-      border: "1px dashed rgba(249,115,22,.35)",
-      borderRadius: 2,
+      top: 0,
+      left: 0,
+      width: "100%",
+      height: "100%",
       pointerEvents: "none"
     }
-  }, /*#__PURE__*/React.createElement("div", {
+  }, /*#__PURE__*/React.createElement("polygon", {
+    points: coverPolyStr,
+    fill: "none",
+    stroke: "rgba(249,115,22,.3)",
+    strokeWidth: "1",
+    strokeDasharray: "4 3"
+  })), /*#__PURE__*/React.createElement("svg", {
     style: {
       position: "absolute",
-      top: 2,
-      left: 3,
-      fontSize: 7,
-      color: "rgba(249,115,22,.5)"
+      top: 0,
+      left: 0,
+      width: "100%",
+      height: "100%",
+      pointerEvents: "none"
     }
-  }, "\u8868\u7D19")), /*#__PURE__*/React.createElement("div", {
-    onMouseDown: e => onDown(e, "move"),
+  }, /*#__PURE__*/React.createElement("polygon", {
+    points: polyStr,
+    fill: "rgba(168,85,247,.15)",
+    stroke: "#a855f7",
+    strokeWidth: "2"
+  })), /*#__PURE__*/React.createElement("div", {
+    onMouseDown: e => onDown(e, "move-all"),
     style: {
       position: "absolute",
-      left: item.spineX * ps,
-      top: item.spineY * ps,
-      width: item.spineW * ps,
-      height: item.spineH * ps,
-      border: "2px solid #a855f7",
-      background: "rgba(168,85,247,.25)",
-      cursor: "move",
-      borderRadius: 2
+      top: 0,
+      left: 0,
+      width: "100%",
+      height: "100%",
+      cursor: "move"
     }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      position: "absolute",
-      top: 2,
-      left: 2,
-      fontSize: 7,
-      color: "#c084fc",
-      writingMode: "vertical-rl",
-      lineHeight: 1
-    }
-  }, "\u80CC\u8868\u7D19"), /*#__PURE__*/React.createElement("div", {
-    onMouseDown: e => onDown(e, "resize"),
-    style: {
-      position: "absolute",
-      bottom: -4,
-      right: -4,
-      width: 9,
-      height: 9,
-      background: "#a855f7",
-      borderRadius: 2,
-      cursor: "nwse-resize"
-    }
-  }))), /*#__PURE__*/React.createElement("div", {
+  }), pts.map(function (p, i) {
+    return /*#__PURE__*/React.createElement("div", {
+      key: i,
+      onMouseDown: function (e) {
+        onDown(e, "spt" + i);
+      },
+      style: {
+        position: "absolute",
+        left: p.x * ps - 5,
+        top: p.y * ps - 5,
+        width: 10,
+        height: 10,
+        background: "#a855f7",
+        borderRadius: "50%",
+        cursor: "crosshair",
+        border: "2px solid #fff",
+        zIndex: 10
+      }
+    });
+  })), /*#__PURE__*/React.createElement("div", {
     style: {
       display: "grid",
       gridTemplateColumns: "1fr 1fr 1fr 1fr",
       gap: 3,
       marginTop: 5
     }
-  }, [["X", "spineX"], ["Y", "spineY"], ["幅", "spineW"], ["高", "spineH"]].map(([l, k]) => /*#__PURE__*/React.createElement("div", {
-    key: k
-  }, /*#__PURE__*/React.createElement("label", {
-    style: {
-      fontSize: 8,
-      color: "#a855f7"
-    }
-  }, l), /*#__PURE__*/React.createElement("input", {
-    type: "number",
-    value: item[k],
-    onChange: e => onUpdate(item.id, {
-      [k]: +e.target.value
-    }),
-    style: {
-      width: "100%",
-      padding: "3px 4px",
-      background: "#161b26",
-      border: "1px solid #2a3040",
-      borderRadius: 3,
-      color: "#e4e4e7",
-      fontSize: 11,
-      outline: "none"
-    }
-  })))));
+  }, ["TL", "TR", "BR", "BL"].map(function (label, i) {
+    return /*#__PURE__*/React.createElement("div", {
+      key: i,
+      style: {
+        fontSize: 8,
+        color: "#a855f7",
+        textAlign: "center"
+      }
+    }, /*#__PURE__*/React.createElement("div", null, label), /*#__PURE__*/React.createElement("div", {
+      style: {
+        color: "#999"
+      }
+    }, pts[i].x, ",", pts[i].y));
+  })));
 }
 
 // ===== DRAGGABLE =====
@@ -1303,10 +1348,12 @@ function Editor({
           upd.spineY = spine.sy;
           upd.spineW = spine.sw;
           upd.spineH = spine.sh;
+          upd.spinePts = rectToPts(spine.sx, spine.sy, spine.sw, spine.sh);
         } else {
           upd.spineW = 0;
           upd.spineH = 0;
           upd.spineImage = null;
+          upd.spinePts = null;
         }
         onUpdate(item.id, upd);
       };
@@ -1380,10 +1427,12 @@ function Editor({
           upd.spineY = spine.sy;
           upd.spineW = spine.sw;
           upd.spineH = spine.sh;
+          upd.spinePts = rectToPts(spine.sx, spine.sy, spine.sw, spine.sh);
         } else {
           upd.spineW = 0;
           upd.spineH = 0;
           upd.spineImage = null;
+          upd.spinePts = null;
         }
         onUpdate(item.id, upd);
       };
