@@ -3614,6 +3614,47 @@ function App() {
   useEffect(function () {
     pushHistory(items);
   }, [items]);
+
+  // ===== AUTO-SAVE: 起動時に復元 =====
+  const hasRestoredRef = useRef(false);
+  useEffect(function () {
+    if (hasRestoredRef.current) return;
+    hasRestoredRef.current = true;
+    try {
+      var saved = localStorage.getItem("mc_autosave");
+      if (saved) {
+        var parsed = JSON.parse(saved);
+        if (parsed && Array.isArray(parsed.items) && parsed.items.length > 0) {
+          skipHistory.current = true;
+          setItems(parsed.items);
+        }
+      }
+    } catch (e) {
+      console.warn("autosave restore failed", e);
+    }
+  }, []);
+
+  // ===== AUTO-SAVE: 変更時に保存（デバウンス500ms） =====
+  const autoSaveTimerRef = useRef(null);
+  useEffect(function () {
+    if (!hasRestoredRef.current) return; // 復元完了前は保存しない
+    if (autoSaveTimerRef.current) clearTimeout(autoSaveTimerRef.current);
+    autoSaveTimerRef.current = setTimeout(function () {
+      try {
+        var payload = {
+          version: 1,
+          savedAt: Date.now(),
+          items: items
+        };
+        localStorage.setItem("mc_autosave", JSON.stringify(payload));
+      } catch (e) {
+        console.warn("autosave failed", e);
+      }
+    }, 500);
+    return function () {
+      if (autoSaveTimerRef.current) clearTimeout(autoSaveTimerRef.current);
+    };
+  }, [items]);
   useEffect(function () {
     function onKey(e) {
       if ((e.metaKey || e.ctrlKey) && e.key === "z") {
@@ -3661,6 +3702,8 @@ function App() {
   const [showCompare, setShowCompare] = useState(false);
   const [showTpl, setShowTpl] = useState(false);
   const [showStarter, setShowStarter] = useState(false);
+  const [showSave, setShowSave] = useState(false);
+  const importFileRef = useRef(null);
   const [exporting, setExporting] = useState(false);
   const [canvaOpen, setCanvaOpen] = useState(false);
   const [cTitle, setCTitle] = useState("");
@@ -4128,6 +4171,76 @@ function App() {
       return prev;
     });
   }, []);
+
+  // ===== プロジェクトの書き出し（JSON） =====
+  const exportProject = useCallback(function () {
+    try {
+      var payload = {
+        version: 1,
+        exportedAt: new Date().toISOString(),
+        app: "MockupComposer",
+        items: items
+      };
+      var blob = new Blob([JSON.stringify(payload, null, 2)], {
+        type: "application/json"
+      });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement("a");
+      a.href = url;
+      var ts = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19);
+      a.download = "mockup-composer-project-" + ts + ".json";
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(function () {
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }, 100);
+      setShowSave(false);
+    } catch (e) {
+      alert("書き出しに失敗しました: " + e.message);
+    }
+  }, [items]);
+
+  // ===== プロジェクトの読み込み（JSON） =====
+  const importProject = useCallback(function (file) {
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function (ev) {
+      try {
+        var parsed = JSON.parse(ev.target.result);
+        if (!parsed || !Array.isArray(parsed.items)) {
+          alert("このファイルはプロジェクトファイルではありません。");
+          return;
+        }
+        if (items.length > 0) {
+          if (!confirm("現在の作業内容は上書きされます。読み込みますか？")) return;
+        }
+        setItems(parsed.items);
+        setSelected(null);
+        setShowSave(false);
+        alert("プロジェクトを読み込みました（" + parsed.items.length + "パーツ）");
+      } catch (e) {
+        alert("読み込みに失敗しました。ファイルが破損している可能性があります。");
+      }
+    };
+    reader.onerror = function () {
+      alert("ファイルの読み込みに失敗しました。");
+    };
+    reader.readAsText(file);
+  }, [items]);
+
+  // ===== 新規作成（autosaveもクリア） =====
+  const newProject = useCallback(function () {
+    if (items.length > 0) {
+      if (!confirm("現在の作業内容は破棄されます。新規作成しますか？")) return;
+    }
+    try {
+      localStorage.removeItem("mc_autosave");
+    } catch (e) {}
+    setItems([]);
+    setSelected(null);
+    setShowSave(false);
+  }, [items]);
   const doExport = useCallback(async () => {
     if (!registered && exportCount >= 1) {
       setShowGate(true);
@@ -4375,6 +4488,156 @@ function App() {
       fontFamily: "inherit"
     }
   }, "\u7D20\u6750\u751F\u6210\u30C4\u30FC\u30EB")), /*#__PURE__*/React.createElement("div", {
+    style: {
+      position: "relative"
+    }
+  }, /*#__PURE__*/React.createElement("button", {
+    onClick: function () {
+      setShowSave(!showSave);
+      setShowExport(false);
+      setCanvaOpen(false);
+      setCfOpen(false);
+      setShowHelp(false);
+    },
+    style: {
+      background: showSave ? "#f97316" : "#161b26",
+      color: showSave ? "#fff" : "#e4e4e7",
+      border: "1px solid #2a3040",
+      borderRadius: 8,
+      padding: "9px 14px",
+      fontSize: 13,
+      fontWeight: 700,
+      cursor: "pointer",
+      fontFamily: "inherit"
+    }
+  }, "\uD83D\uDCC2 \u4FDD\u5B58/\u8AAD\u8FBC"), showSave && /*#__PURE__*/React.createElement("div", {
+    style: {
+      position: "absolute",
+      top: "100%",
+      right: 0,
+      marginTop: 8,
+      background: "#161b26",
+      borderRadius: 12,
+      padding: 6,
+      boxShadow: "0 12px 40px rgba(0,0,0,.4)",
+      zIndex: 100,
+      width: 260,
+      border: "1px solid #2a3040"
+    },
+    onClick: function (e) {
+      e.stopPropagation();
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 11,
+      fontWeight: 700,
+      color: "#f97316",
+      padding: "8px 12px",
+      borderBottom: "1px solid #2a3040"
+    }
+  }, "\u30D7\u30ED\u30B8\u30A7\u30AF\u30C8\u7BA1\u7406"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      padding: "10px 12px",
+      fontSize: 10,
+      color: "#22c55e",
+      background: "rgba(34,197,94,.08)",
+      borderRadius: 6,
+      margin: 4,
+      display: "flex",
+      alignItems: "center",
+      gap: 6
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 12
+    }
+  }, "\u2713"), /*#__PURE__*/React.createElement("span", null, "\u4F5C\u696D\u5185\u5BB9\u306F\u81EA\u52D5\u4FDD\u5B58\u3055\u308C\u3066\u3044\u307E\u3059")), /*#__PURE__*/React.createElement("button", {
+    onClick: exportProject,
+    style: {
+      display: "block",
+      width: "calc(100% - 8px)",
+      margin: "4px",
+      padding: "10px 12px",
+      fontSize: 12,
+      color: "#fff",
+      background: "linear-gradient(135deg,#3b82f6,#1d4ed8)",
+      border: "none",
+      borderRadius: 6,
+      cursor: "pointer",
+      fontFamily: "inherit",
+      fontWeight: 700,
+      textAlign: "left"
+    }
+  }, "\uD83D\uDCBE \u30D7\u30ED\u30B8\u30A7\u30AF\u30C8\u3092\u66F8\u304D\u51FA\u3059", /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 9,
+      opacity: .85,
+      fontWeight: 500,
+      marginTop: 2
+    }
+  }, "JSON\u30D5\u30A1\u30A4\u30EB\u3068\u3057\u3066\u30C0\u30A6\u30F3\u30ED\u30FC\u30C9")), /*#__PURE__*/React.createElement("button", {
+    onClick: function () {
+      if (importFileRef.current) importFileRef.current.click();
+    },
+    style: {
+      display: "block",
+      width: "calc(100% - 8px)",
+      margin: "4px",
+      padding: "10px 12px",
+      fontSize: 12,
+      color: "#fff",
+      background: "linear-gradient(135deg,#8b5cf6,#6d28d9)",
+      border: "none",
+      borderRadius: 6,
+      cursor: "pointer",
+      fontFamily: "inherit",
+      fontWeight: 700,
+      textAlign: "left"
+    }
+  }, "\uD83D\uDCE5 \u30D7\u30ED\u30B8\u30A7\u30AF\u30C8\u3092\u8AAD\u307F\u8FBC\u3080", /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 9,
+      opacity: .85,
+      fontWeight: 500,
+      marginTop: 2
+    }
+  }, "\u66F8\u304D\u51FA\u3057\u305FJSON\u30D5\u30A1\u30A4\u30EB\u3092\u5FA9\u5143")), /*#__PURE__*/React.createElement("input", {
+    ref: importFileRef,
+    type: "file",
+    accept: "application/json,.json",
+    style: {
+      display: "none"
+    },
+    onChange: function (e) {
+      var f = e.target.files && e.target.files[0];
+      if (f) {
+        importProject(f);
+        e.target.value = "";
+      }
+    }
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      borderTop: "1px solid #2a3040",
+      margin: "4px 0"
+    }
+  }), /*#__PURE__*/React.createElement("button", {
+    onClick: newProject,
+    style: {
+      display: "block",
+      width: "calc(100% - 8px)",
+      margin: "4px",
+      padding: "8px 12px",
+      fontSize: 11,
+      color: "#ef4444",
+      background: "none",
+      border: "1px solid rgba(239,68,68,.3)",
+      borderRadius: 6,
+      cursor: "pointer",
+      fontFamily: "inherit",
+      fontWeight: 700,
+      textAlign: "left"
+    }
+  }, "\uD83D\uDDD1 \u65B0\u898F\u4F5C\u6210\uFF08\u4F5C\u696D\u5185\u5BB9\u3092\u7834\u68C4\uFF09"))), /*#__PURE__*/React.createElement("div", {
     style: {
       position: "relative"
     }

@@ -1246,6 +1246,37 @@ export default function App() {
 
   useEffect(function(){pushHistory(items);},[items]);
 
+  // ===== AUTO-SAVE: 起動時に復元 =====
+  const hasRestoredRef = useRef(false);
+  useEffect(function(){
+    if(hasRestoredRef.current) return;
+    hasRestoredRef.current = true;
+    try{
+      var saved = localStorage.getItem("mc_autosave");
+      if(saved){
+        var parsed = JSON.parse(saved);
+        if(parsed && Array.isArray(parsed.items) && parsed.items.length > 0){
+          skipHistory.current = true;
+          setItems(parsed.items);
+        }
+      }
+    }catch(e){ console.warn("autosave restore failed", e); }
+  },[]);
+
+  // ===== AUTO-SAVE: 変更時に保存（デバウンス500ms） =====
+  const autoSaveTimerRef = useRef(null);
+  useEffect(function(){
+    if(!hasRestoredRef.current) return; // 復元完了前は保存しない
+    if(autoSaveTimerRef.current) clearTimeout(autoSaveTimerRef.current);
+    autoSaveTimerRef.current = setTimeout(function(){
+      try{
+        var payload = { version: 1, savedAt: Date.now(), items: items };
+        localStorage.setItem("mc_autosave", JSON.stringify(payload));
+      }catch(e){ console.warn("autosave failed", e); }
+    }, 500);
+    return function(){ if(autoSaveTimerRef.current) clearTimeout(autoSaveTimerRef.current); };
+  },[items]);
+
   useEffect(function(){
     function onKey(e){
       if((e.metaKey||e.ctrlKey)&&e.key==="z"){
@@ -1283,6 +1314,8 @@ export default function App() {
   const [showCompare, setShowCompare] = useState(false);
   const [showTpl, setShowTpl] = useState(false);
   const [showStarter, setShowStarter] = useState(false);
+  const [showSave, setShowSave] = useState(false);
+  const importFileRef = useRef(null);
   const [exporting, setExporting] = useState(false);
   const [canvaOpen, setCanvaOpen] = useState(false);
   const [cTitle, setCTitle] = useState("");
@@ -1617,6 +1650,67 @@ export default function App() {
   const moveUp = useCallback((id) => { setItems(prev => { const i = prev.findIndex(it => it.id === id); if (i < prev.length - 1) { const n = [...prev]; [n[i], n[i+1]] = [n[i+1], n[i]]; return n; } return prev; }); }, []);
   const moveDown = useCallback((id) => { setItems(prev => { const i = prev.findIndex(it => it.id === id); if (i > 0) { const n = [...prev]; [n[i], n[i-1]] = [n[i-1], n[i]]; return n; } return prev; }); }, []);
 
+  // ===== プロジェクトの書き出し（JSON） =====
+  const exportProject = useCallback(function(){
+    try{
+      var payload = {
+        version: 1,
+        exportedAt: new Date().toISOString(),
+        app: "MockupComposer",
+        items: items,
+      };
+      var blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement("a");
+      a.href = url;
+      var ts = new Date().toISOString().replace(/[:.]/g,"-").slice(0,19);
+      a.download = "mockup-composer-project-" + ts + ".json";
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(function(){ document.body.removeChild(a); URL.revokeObjectURL(url); }, 100);
+      setShowSave(false);
+    }catch(e){
+      alert("書き出しに失敗しました: " + e.message);
+    }
+  },[items]);
+
+  // ===== プロジェクトの読み込み（JSON） =====
+  const importProject = useCallback(function(file){
+    if(!file) return;
+    var reader = new FileReader();
+    reader.onload = function(ev){
+      try{
+        var parsed = JSON.parse(ev.target.result);
+        if(!parsed || !Array.isArray(parsed.items)){
+          alert("このファイルはプロジェクトファイルではありません。");
+          return;
+        }
+        if(items.length > 0){
+          if(!confirm("現在の作業内容は上書きされます。読み込みますか？")) return;
+        }
+        setItems(parsed.items);
+        setSelected(null);
+        setShowSave(false);
+        alert("プロジェクトを読み込みました（" + parsed.items.length + "パーツ）");
+      }catch(e){
+        alert("読み込みに失敗しました。ファイルが破損している可能性があります。");
+      }
+    };
+    reader.onerror = function(){ alert("ファイルの読み込みに失敗しました。"); };
+    reader.readAsText(file);
+  },[items]);
+
+  // ===== 新規作成（autosaveもクリア） =====
+  const newProject = useCallback(function(){
+    if(items.length > 0){
+      if(!confirm("現在の作業内容は破棄されます。新規作成しますか？")) return;
+    }
+    try{ localStorage.removeItem("mc_autosave"); }catch(e){}
+    setItems([]);
+    setSelected(null);
+    setShowSave(false);
+  },[items]);
+
   const doExport = useCallback(async () => {
     if(!registered && exportCount >= 1){
       setShowGate(true);
@@ -1717,6 +1811,21 @@ export default function App() {
           <button onClick={function(){setShowGrid(!showGrid);}} style={{ fontSize: 10, padding: "4px 10px", borderRadius: 6, cursor: "pointer", border: "none", fontFamily: "inherit", fontWeight: 600, background: showGrid ? "#f97316" : "#161b26", color: showGrid ? "#fff" : "#888" }}>Grid</button>
           <div style={{ position: "relative" }}>
             <button onClick={function(){setShowMCTool(true);setCanvaOpen(false);setCfOpen(false);setShowExport(false);}} style={{ background: "linear-gradient(135deg,#35C9A0,#0F6E56)", color: "#fff", border: "none", borderRadius: 8, padding: "9px 16px", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>素材生成ツール</button>
+          </div>
+          <div style={{ position: "relative" }}>
+            <button onClick={function(){setShowSave(!showSave);setShowExport(false);setCanvaOpen(false);setCfOpen(false);setShowHelp(false);}} style={{ background: showSave ? "#f97316" : "#161b26", color: showSave ? "#fff" : "#e4e4e7", border: "1px solid #2a3040", borderRadius: 8, padding: "9px 14px", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>📂 保存/読込</button>
+            {showSave && <div style={{ position: "absolute", top: "100%", right: 0, marginTop: 8, background: "#161b26", borderRadius: 12, padding: 6, boxShadow: "0 12px 40px rgba(0,0,0,.4)", zIndex: 100, width: 260, border: "1px solid #2a3040" }} onClick={function(e){e.stopPropagation();}}>
+              <div style={{ fontSize: 11, fontWeight: 700, color: "#f97316", padding: "8px 12px", borderBottom: "1px solid #2a3040" }}>プロジェクト管理</div>
+              <div style={{ padding: "10px 12px", fontSize: 10, color: "#22c55e", background: "rgba(34,197,94,.08)", borderRadius: 6, margin: 4, display: "flex", alignItems: "center", gap: 6 }}>
+                <span style={{ fontSize: 12 }}>✓</span>
+                <span>作業内容は自動保存されています</span>
+              </div>
+              <button onClick={exportProject} style={{ display: "block", width: "calc(100% - 8px)", margin: "4px", padding: "10px 12px", fontSize: 12, color: "#fff", background: "linear-gradient(135deg,#3b82f6,#1d4ed8)", border: "none", borderRadius: 6, cursor: "pointer", fontFamily: "inherit", fontWeight: 700, textAlign: "left" }}>💾 プロジェクトを書き出す<div style={{ fontSize: 9, opacity: .85, fontWeight: 500, marginTop: 2 }}>JSONファイルとしてダウンロード</div></button>
+              <button onClick={function(){ if(importFileRef.current) importFileRef.current.click(); }} style={{ display: "block", width: "calc(100% - 8px)", margin: "4px", padding: "10px 12px", fontSize: 12, color: "#fff", background: "linear-gradient(135deg,#8b5cf6,#6d28d9)", border: "none", borderRadius: 6, cursor: "pointer", fontFamily: "inherit", fontWeight: 700, textAlign: "left" }}>📥 プロジェクトを読み込む<div style={{ fontSize: 9, opacity: .85, fontWeight: 500, marginTop: 2 }}>書き出したJSONファイルを復元</div></button>
+              <input ref={importFileRef} type="file" accept="application/json,.json" style={{ display: "none" }} onChange={function(e){ var f = e.target.files && e.target.files[0]; if(f){ importProject(f); e.target.value = ""; } }} />
+              <div style={{ borderTop: "1px solid #2a3040", margin: "4px 0" }} />
+              <button onClick={newProject} style={{ display: "block", width: "calc(100% - 8px)", margin: "4px", padding: "8px 12px", fontSize: 11, color: "#ef4444", background: "none", border: "1px solid rgba(239,68,68,.3)", borderRadius: 6, cursor: "pointer", fontFamily: "inherit", fontWeight: 700, textAlign: "left" }}>🗑 新規作成（作業内容を破棄）</button>
+            </div>}
           </div>
           <div style={{ position: "relative" }}>
             <button onClick={() => setShowExport(!showExport)} style={{ background: "linear-gradient(135deg,#5b6abf,#4a58a0)", color: "#fff", border: "none", borderRadius: 8, padding: "9px 22px", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>Export ↓</button>
