@@ -1982,13 +1982,40 @@ export default function App() {
 
           {/* CTA */}
           <div style={{ textAlign: "center", paddingBottom: 60 }}>
-            <button onClick={function(){setShowWelcome(false);try{localStorage.setItem("mc_welcomed","true");}catch(e){}}} style={{
+            <style>{`
+              @keyframes mc-cta-pulse {
+                0%, 100% { box-shadow: 0 8px 24px rgba(249,115,22,.35), 0 0 0 0 rgba(249,115,22,.6); transform: scale(1); }
+                50% { box-shadow: 0 12px 48px rgba(249,115,22,.7), 0 0 0 16px rgba(249,115,22,0); transform: scale(1.02); }
+              }
+              @keyframes mc-cta-shine {
+                0% { transform: translateX(-100%); }
+                100% { transform: translateX(200%); }
+              }
+              .mc-cta-btn {
+                animation: mc-cta-pulse 2s ease-in-out infinite;
+                position: relative;
+                overflow: hidden;
+              }
+              .mc-cta-btn::before {
+                content: "";
+                position: absolute;
+                top: 0; left: 0; width: 50%; height: 100%;
+                background: linear-gradient(90deg, transparent, rgba(255,255,255,.35), transparent);
+                animation: mc-cta-shine 2.5s ease-in-out infinite;
+              }
+              .mc-cta-btn:hover {
+                animation-play-state: paused;
+                transform: scale(1.03) !important;
+                box-shadow: 0 16px 56px rgba(249,115,22,.8) !important;
+              }
+            `}</style>
+            <button className="mc-cta-btn" onClick={function(){setShowWelcome(false);try{localStorage.setItem("mc_welcomed","true");}catch(e){}}} style={{
               width: "100%", padding: "18px 0",
               background: "linear-gradient(135deg,#f97316,#ea580c)",
               color: "#fff", border: "none", borderRadius: 14,
               fontSize: 18, fontWeight: 900, cursor: "pointer",
               fontFamily: "inherit",
-              boxShadow: "0 8px 32px rgba(249,115,22,.3)",
+              transition: "transform .2s, box-shadow .2s",
             }}>今すぐ作成する →</button>
             <div style={{ fontSize: 11, color: "#555", marginTop: 10 }}>無料・登録不要・30種フレーム内蔵</div>
             <div style={{ marginTop: 32, fontSize: 10, color: "#333", lineHeight: 2, textAlign: "center" }}>

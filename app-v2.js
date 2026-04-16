@@ -5681,7 +5681,34 @@ function App() {
       textAlign: "center",
       paddingBottom: 60
     }
-  }, /*#__PURE__*/React.createElement("button", {
+  }, /*#__PURE__*/React.createElement("style", null, `
+              @keyframes mc-cta-pulse {
+                0%, 100% { box-shadow: 0 8px 24px rgba(249,115,22,.35), 0 0 0 0 rgba(249,115,22,.6); transform: scale(1); }
+                50% { box-shadow: 0 12px 48px rgba(249,115,22,.7), 0 0 0 16px rgba(249,115,22,0); transform: scale(1.02); }
+              }
+              @keyframes mc-cta-shine {
+                0% { transform: translateX(-100%); }
+                100% { transform: translateX(200%); }
+              }
+              .mc-cta-btn {
+                animation: mc-cta-pulse 2s ease-in-out infinite;
+                position: relative;
+                overflow: hidden;
+              }
+              .mc-cta-btn::before {
+                content: "";
+                position: absolute;
+                top: 0; left: 0; width: 50%; height: 100%;
+                background: linear-gradient(90deg, transparent, rgba(255,255,255,.35), transparent);
+                animation: mc-cta-shine 2.5s ease-in-out infinite;
+              }
+              .mc-cta-btn:hover {
+                animation-play-state: paused;
+                transform: scale(1.03) !important;
+                box-shadow: 0 16px 56px rgba(249,115,22,.8) !important;
+              }
+            `), /*#__PURE__*/React.createElement("button", {
+    className: "mc-cta-btn",
     onClick: function () {
       setShowWelcome(false);
       try {
@@ -5699,7 +5726,7 @@ function App() {
       fontWeight: 900,
       cursor: "pointer",
       fontFamily: "inherit",
-      boxShadow: "0 8px 32px rgba(249,115,22,.3)"
+      transition: "transform .2s, box-shadow .2s"
     }
   }, "\u4ECA\u3059\u3050\u4F5C\u6210\u3059\u308B \u2192"), /*#__PURE__*/React.createElement("div", {
     style: {
