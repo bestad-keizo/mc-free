@@ -5498,23 +5498,23 @@ function App() {
     alt: "Mockup Composer"
   }), /*#__PURE__*/React.createElement("h1", {
     style: {
-      fontSize: 28,
+      fontSize: 26,
       fontWeight: 900,
-      lineHeight: 1.3,
+      lineHeight: 1.4,
       color: "#fff",
-      marginBottom: 12
+      marginBottom: 14
     }
-  }, "\u30D7\u30ED\u54C1\u8CEA\u306E3D\u30E2\u30C3\u30AF\u30A2\u30C3\u30D7\u3092", /*#__PURE__*/React.createElement("br", null), /*#__PURE__*/React.createElement("span", {
+  }, "\u58F2\u308C\u3066\u308B\u4EBA\u306E\u30BB\u30FC\u30EB\u30B9\u30DA\u30FC\u30B8\u306B\u3001", /*#__PURE__*/React.createElement("br", null), /*#__PURE__*/React.createElement("span", {
     style: {
       color: "#f97316"
     }
-  }, "3\u5206\u3067\u7121\u6599\u4F5C\u6210")), /*#__PURE__*/React.createElement("p", {
+  }, "\u306A\u305C\u30E2\u30C3\u30AF\u30A2\u30C3\u30D7\u304C\u3042\u308B\u306E\u304B\uFF1F")), /*#__PURE__*/React.createElement("p", {
     style: {
       fontSize: 14,
       color: "#94a3b8",
-      lineHeight: 1.7
+      lineHeight: 1.8
     }
-  }, "\u30C7\u30B6\u30A4\u30F3\u30B9\u30AD\u30EB\u4E0D\u8981\u3002\u30D6\u30E9\u30A6\u30B6\u3060\u3051\u3067\u5B8C\u7D50\u3002")), /*#__PURE__*/React.createElement("div", {
+  }, "\u914D\u8272\u3082\u30B3\u30D4\u30FC\u3082AI\u4EFB\u305B\u3002", /*#__PURE__*/React.createElement("br", null), "\u3042\u306A\u305F\u306F\u9078\u3076\u3060\u3051\u3067\u3001LP\u306E\u4E16\u754C\u89B3\u306B\u5408\u3063\u305F\u30E2\u30C3\u30AF\u30A2\u30C3\u30D7\u304C\u5B8C\u6210\u3002")), /*#__PURE__*/React.createElement("div", {
     style: {
       marginBottom: 32
     }
@@ -5606,7 +5606,7 @@ function App() {
     color: "#f97316"
   }, {
     num: "2",
-    text: "画像をドラッグ＆ドロップ",
+    text: "画像をCanvaで自動生成",
     color: "#3b82f6"
   }, {
     num: "3",
@@ -5665,14 +5665,14 @@ function App() {
     }
   }, /*#__PURE__*/React.createElement("div", {
     className: "voomly-embed",
-    "data-id": "39jQ88GXDwGhDnMUd90clCkzLTwSR9CMIVsjeJECQBLiYQsIi",
-    "data-ratio": "1.777778",
+    "data-id": "VoNMKHlWeUyGy0dQnByXq82TEQeT-8kA2JZeFitFk7DYlOw2v",
+    "data-ratio": "1.736111",
     "data-type": "v",
     "data-skin-color": "#FF8F00",
     "data-shadow": "",
     style: {
       width: "100%",
-      aspectRatio: "1.77778 / 1",
+      aspectRatio: "1.73611 / 1",
       background: "linear-gradient(45deg, rgb(142, 150, 164) 0%, rgb(201, 208, 222) 100%)",
       borderRadius: 10
     }

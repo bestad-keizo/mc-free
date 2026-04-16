@@ -1916,8 +1916,8 @@ export default function App() {
           {/* LOGO */}
           <div style={{ textAlign: "center", padding: "60px 0 32px" }}>
             <img src={FRAME_BASE+"mc-logo.png"} style={{ height: 60, marginBottom: 16 }} alt="Mockup Composer" />
-            <h1 style={{ fontSize: 28, fontWeight: 900, lineHeight: 1.3, color: "#fff", marginBottom: 12 }}>プロ品質の3Dモックアップを<br/><span style={{ color: "#f97316" }}>3分で無料作成</span></h1>
-            <p style={{ fontSize: 14, color: "#94a3b8", lineHeight: 1.7 }}>デザインスキル不要。ブラウザだけで完結。</p>
+            <h1 style={{ fontSize: 26, fontWeight: 900, lineHeight: 1.4, color: "#fff", marginBottom: 14 }}>売れてる人のセールスページに、<br/><span style={{ color: "#f97316" }}>なぜモックアップがあるのか？</span></h1>
+            <p style={{ fontSize: 14, color: "#94a3b8", lineHeight: 1.8 }}>配色もコピーもAI任せ。<br/>あなたは選ぶだけで、LPの世界観に合ったモックアップが完成。</p>
           </div>
 
           {/* DEMO VISUAL */}
@@ -1949,7 +1949,7 @@ export default function App() {
           <div style={{ marginBottom: 32 }}>
             {[
               { num: "1", text: "フレームを選ぶ", color: "#f97316" },
-              { num: "2", text: "画像をドラッグ＆ドロップ", color: "#3b82f6" },
+              { num: "2", text: "画像をCanvaで自動生成", color: "#3b82f6" },
               { num: "3", text: "3D回転 → Export", color: "#22c55e" },
             ].map(function(s,i){return <div key={i} style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 10 }}>
               <div style={{ width: 36, height: 36, borderRadius: "50%", background: s.color, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, fontWeight: 900, flexShrink: 0 }}>{s.num}</div>
@@ -1971,12 +1971,12 @@ export default function App() {
               }
             }} style={{ maxWidth: 480, margin: "0 auto" }}>
               <div className="voomly-embed"
-                data-id="39jQ88GXDwGhDnMUd90clCkzLTwSR9CMIVsjeJECQBLiYQsIi"
-                data-ratio="1.777778"
+                data-id="VoNMKHlWeUyGy0dQnByXq82TEQeT-8kA2JZeFitFk7DYlOw2v"
+                data-ratio="1.736111"
                 data-type="v"
                 data-skin-color="#FF8F00"
                 data-shadow=""
-                style={{ width: "100%", aspectRatio: "1.77778 / 1", background: "linear-gradient(45deg, rgb(142, 150, 164) 0%, rgb(201, 208, 222) 100%)", borderRadius: 10 }} />
+                style={{ width: "100%", aspectRatio: "1.73611 / 1", background: "linear-gradient(45deg, rgb(142, 150, 164) 0%, rgb(201, 208, 222) 100%)", borderRadius: 10 }} />
             </div>
           </div>
 
