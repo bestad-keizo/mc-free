@@ -1957,9 +1957,27 @@ export default function App() {
             </div>;})}
           </div>
 
-          {/* DEMO IMAGE */}
+          {/* DEMO VIDEO (Voomly) */}
           <div style={{ textAlign: "center", marginBottom: 32 }}>
-            <img src={FRAME_BASE+"splash-demo.png"} style={{ width: "100%", maxWidth: 480, borderRadius: 12 }} alt="完成例" />
+            <div ref={function(el){
+              if(!el || el.dataset.loaded) return;
+              el.dataset.loaded = "1";
+              // Voomlyスクリプトをロード
+              if(!document.querySelector('script[src*="voomly"]')){
+                var s = document.createElement("script");
+                s.src = "https://embed.voomly.softwarepublishingapp.com/embed/embed-build.js";
+                s.async = true;
+                document.head.appendChild(s);
+              }
+            }} style={{ maxWidth: 480, margin: "0 auto" }}>
+              <div className="voomly-embed"
+                data-id="39jQ88GXDwGhDnMUd90clCkzLTwSR9CMIVsjeJECQBLiYQsIi"
+                data-ratio="1.777778"
+                data-type="v"
+                data-skin-color="#FF8F00"
+                data-shadow=""
+                style={{ width: "100%", aspectRatio: "1.77778 / 1", background: "linear-gradient(45deg, rgb(142, 150, 164) 0%, rgb(201, 208, 222) 100%)", borderRadius: 10 }} />
+            </div>
           </div>
 
           {/* CTA */}
