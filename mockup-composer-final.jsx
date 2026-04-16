@@ -1282,6 +1282,7 @@ export default function App() {
   const [showProPanel, setShowProPanel] = useState(false);
   const [showCompare, setShowCompare] = useState(false);
   const [showTpl, setShowTpl] = useState(false);
+  const [showStarter, setShowStarter] = useState(false);
   const [exporting, setExporting] = useState(false);
   const [canvaOpen, setCanvaOpen] = useState(false);
   const [cTitle, setCTitle] = useState("");
@@ -1813,6 +1814,30 @@ export default function App() {
             <div style={{ position: "absolute", inset: 0, width: 1200, height: 800, borderRadius: 8, overflow: "hidden", ...wsBgStyle }} />
             <div ref={canvasRef} style={{ position: "relative", width: 1200, height: 800, overflow: "hidden" }}>
               {items.map((it, idx) => (<Draggable key={it.id} item={{...it, zIndex: idx + 1}} onUpdate={updateItem} selected={selected === it.id} onSelect={setSelected} cScale={cScale} snap={showGrid} />))}
+              {items.length === 0 && (
+                <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", pointerEvents: "none", zIndex: 1 }}>
+                  <div style={{ fontSize: 56, marginBottom: 20, opacity: .35 }}>✨</div>
+                  <div style={{ fontSize: 26, fontWeight: 900, color: "rgba(249,115,22,.85)", marginBottom: 10, textAlign: "center", letterSpacing: ".02em" }}>ここから始めましょう</div>
+                  <div style={{ fontSize: 14, color: "rgba(255,255,255,.5)", marginBottom: 30, textAlign: "center" }}>3つの選び方から1つ選んでください</div>
+                  <div style={{ display: "flex", gap: 16, pointerEvents: "auto", flexWrap: "wrap", justifyContent: "center" }}>
+                    <button onClick={function(e){e.stopPropagation();setShowMCTool(true);}} style={{ padding: "14px 22px", background: "linear-gradient(135deg,#35C9A0,#0F6E56)", color: "#fff", border: "none", borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", boxShadow: "0 6px 20px rgba(53,201,160,.3)", display: "flex", flexDirection: "column", alignItems: "center", gap: 4, minWidth: 140 }}>
+                      <span style={{ fontSize: 28 }}>🎨</span>
+                      <span>AI画像を作る</span>
+                      <span style={{ fontSize: 10, opacity: .8, fontWeight: 500 }}>LPから自動生成</span>
+                    </button>
+                    <button onClick={function(e){e.stopPropagation();setShowStarter(true);}} style={{ padding: "14px 22px", background: "linear-gradient(135deg,#f97316,#ea580c)", color: "#fff", border: "none", borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", boxShadow: "0 6px 20px rgba(249,115,22,.3)", display: "flex", flexDirection: "column", alignItems: "center", gap: 4, minWidth: 140 }}>
+                      <span style={{ fontSize: 28 }}>📋</span>
+                      <span>テンプレで始める</span>
+                      <span style={{ fontSize: 10, opacity: .8, fontWeight: 500 }}>4つのパターン</span>
+                    </button>
+                    <button onClick={function(e){e.stopPropagation();addItem();}} style={{ padding: "14px 22px", background: "rgba(255,255,255,.08)", color: "#e4e4e7", border: "1px solid rgba(255,255,255,.2)", borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", display: "flex", flexDirection: "column", alignItems: "center", gap: 4, minWidth: 140 }}>
+                      <span style={{ fontSize: 28 }}>＋</span>
+                      <span>空から作る</span>
+                      <span style={{ fontSize: 10, opacity: .6, fontWeight: 500 }}>パーツを1つ追加</span>
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
             {showGrid && <div style={{ position: "absolute", inset: 0, width: 1200, height: 800, pointerEvents: "none", zIndex: 9000 }}>
               <svg width="1200" height="800" style={{ position: "absolute", inset: 0 }}>
@@ -2009,7 +2034,7 @@ export default function App() {
                 box-shadow: 0 16px 56px rgba(249,115,22,.8) !important;
               }
             `}</style>
-            <button className="mc-cta-btn" onClick={function(){setShowWelcome(false);try{localStorage.setItem("mc_welcomed","true");}catch(e){}}} style={{
+            <button className="mc-cta-btn" onClick={function(){setShowWelcome(false);try{localStorage.setItem("mc_welcomed","true");}catch(e){};setTimeout(function(){setShowStarter(true);},400);}} style={{
               width: "100%", padding: "18px 0",
               background: "linear-gradient(135deg,#f97316,#ea580c)",
               color: "#fff", border: "none", borderRadius: 14,
@@ -2025,6 +2050,50 @@ export default function App() {
             </div>
           </div>
 
+        </div>
+      </div>}
+
+      {/* ===== STARTER MODAL (初回CTA後の選択肢) ===== */}
+      {showStarter && <div style={{ position: "fixed", inset: 0, zIndex: 9999, background: "rgba(10,14,23,.85)", backdropFilter: "blur(8px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }} onClick={function(){setShowStarter(false);}}>
+        <div onClick={function(e){e.stopPropagation();}} style={{ background: "linear-gradient(180deg,#161b26,#0d1117)", borderRadius: 20, padding: "36px 28px", maxWidth: 520, width: "100%", border: "1px solid #2a3040", boxShadow: "0 20px 60px rgba(0,0,0,.6)", position: "relative" }}>
+          <button onClick={function(){setShowStarter(false);}} style={{ position: "absolute", top: 14, right: 14, width: 32, height: 32, borderRadius: "50%", background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.1)", color: "#888", fontSize: 16, cursor: "pointer", fontFamily: "inherit" }}>×</button>
+          <div style={{ textAlign: "center", marginBottom: 24 }}>
+            <div style={{ fontSize: 38, marginBottom: 10 }}>🚀</div>
+            <h2 style={{ fontSize: 22, fontWeight: 900, color: "#fff", marginBottom: 8 }}>どこから始めますか？</h2>
+            <p style={{ fontSize: 13, color: "#94a3b8" }}>迷ったら「AI画像を作る」から。LPのスクショ1枚で自動生成できます。</p>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            <button onClick={function(){setShowStarter(false);setShowMCTool(true);}} style={{ padding: "16px 20px", background: "linear-gradient(135deg,#35C9A0,#0F6E56)", color: "#fff", border: "none", borderRadius: 12, fontSize: 14, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", textAlign: "left", display: "flex", alignItems: "center", gap: 14, boxShadow: "0 4px 16px rgba(53,201,160,.25)" }}>
+              <span style={{ fontSize: 32 }}>🎨</span>
+              <span style={{ flex: 1 }}>
+                <span style={{ display: "block", fontSize: 15, fontWeight: 800 }}>AI画像を作る</span>
+                <span style={{ display: "block", fontSize: 11, opacity: .85, fontWeight: 500, marginTop: 2 }}>LPのスクショ → Canva AIで4サイズ自動生成</span>
+              </span>
+              <span style={{ fontSize: 18 }}>→</span>
+            </button>
+            <button onClick={function(){setShowStarter(false);applyTemplate("stack3");}} style={{ padding: "16px 20px", background: "linear-gradient(135deg,#f97316,#ea580c)", color: "#fff", border: "none", borderRadius: 12, fontSize: 14, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", textAlign: "left", display: "flex", alignItems: "center", gap: 14, boxShadow: "0 4px 16px rgba(249,115,22,.25)" }}>
+              <span style={{ fontSize: 32 }}>📦</span>
+              <span style={{ flex: 1 }}>
+                <span style={{ display: "block", fontSize: 15, fontWeight: 800 }}>Stack 3点テンプレで始める</span>
+                <span style={{ display: "block", fontSize: 11, opacity: .85, fontWeight: 500, marginTop: 2 }}>iMac＋iPad＋iPhoneの王道レイアウト</span>
+              </span>
+              <span style={{ fontSize: 18 }}>→</span>
+            </button>
+            <button onClick={function(){setShowStarter(false);applyTemplate("stack5");}} style={{ padding: "16px 20px", background: "linear-gradient(135deg,#6366f1,#4f46e5)", color: "#fff", border: "none", borderRadius: 12, fontSize: 14, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", textAlign: "left", display: "flex", alignItems: "center", gap: 14, boxShadow: "0 4px 16px rgba(99,102,241,.25)" }}>
+              <span style={{ fontSize: 32 }}>🎁</span>
+              <span style={{ flex: 1 }}>
+                <span style={{ display: "block", fontSize: 15, fontWeight: 800 }}>フルセット 5点で始める</span>
+                <span style={{ display: "block", fontSize: 11, opacity: .85, fontWeight: 500, marginTop: 2 }}>豪華オファー向け・価値の積み上げ表現</span>
+              </span>
+              <span style={{ fontSize: 18 }}>→</span>
+            </button>
+            <button onClick={function(){setShowStarter(false);}} style={{ padding: "12px 20px", background: "none", color: "#888", border: "1px solid #2a3040", borderRadius: 12, fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "inherit", marginTop: 6 }}>
+              自分で自由に作る（空から）
+            </button>
+          </div>
+          <div style={{ textAlign: "center", marginTop: 18, fontSize: 11, color: "#555" }}>
+            あとでいつでも変更できます
+          </div>
         </div>
       </div>}
 

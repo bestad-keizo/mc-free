@@ -3660,6 +3660,7 @@ function App() {
   const [showProPanel, setShowProPanel] = useState(false);
   const [showCompare, setShowCompare] = useState(false);
   const [showTpl, setShowTpl] = useState(false);
+  const [showStarter, setShowStarter] = useState(false);
   const [exporting, setExporting] = useState(false);
   const [canvaOpen, setCanvaOpen] = useState(false);
   const [cTitle, setCTitle] = useState("");
@@ -5006,7 +5007,143 @@ function App() {
     onSelect: setSelected,
     cScale: cScale,
     snap: showGrid
-  }))), showGrid && /*#__PURE__*/React.createElement("div", {
+  })), items.length === 0 && /*#__PURE__*/React.createElement("div", {
+    style: {
+      position: "absolute",
+      inset: 0,
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "center",
+      pointerEvents: "none",
+      zIndex: 1
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 56,
+      marginBottom: 20,
+      opacity: .35
+    }
+  }, "\u2728"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 26,
+      fontWeight: 900,
+      color: "rgba(249,115,22,.85)",
+      marginBottom: 10,
+      textAlign: "center",
+      letterSpacing: ".02em"
+    }
+  }, "\u3053\u3053\u304B\u3089\u59CB\u3081\u307E\u3057\u3087\u3046"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 14,
+      color: "rgba(255,255,255,.5)",
+      marginBottom: 30,
+      textAlign: "center"
+    }
+  }, "3\u3064\u306E\u9078\u3073\u65B9\u304B\u30891\u3064\u9078\u3093\u3067\u304F\u3060\u3055\u3044"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: 16,
+      pointerEvents: "auto",
+      flexWrap: "wrap",
+      justifyContent: "center"
+    }
+  }, /*#__PURE__*/React.createElement("button", {
+    onClick: function (e) {
+      e.stopPropagation();
+      setShowMCTool(true);
+    },
+    style: {
+      padding: "14px 22px",
+      background: "linear-gradient(135deg,#35C9A0,#0F6E56)",
+      color: "#fff",
+      border: "none",
+      borderRadius: 10,
+      fontSize: 14,
+      fontWeight: 700,
+      cursor: "pointer",
+      fontFamily: "inherit",
+      boxShadow: "0 6px 20px rgba(53,201,160,.3)",
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      gap: 4,
+      minWidth: 140
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 28
+    }
+  }, "\uD83C\uDFA8"), /*#__PURE__*/React.createElement("span", null, "AI\u753B\u50CF\u3092\u4F5C\u308B"), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 10,
+      opacity: .8,
+      fontWeight: 500
+    }
+  }, "LP\u304B\u3089\u81EA\u52D5\u751F\u6210")), /*#__PURE__*/React.createElement("button", {
+    onClick: function (e) {
+      e.stopPropagation();
+      setShowStarter(true);
+    },
+    style: {
+      padding: "14px 22px",
+      background: "linear-gradient(135deg,#f97316,#ea580c)",
+      color: "#fff",
+      border: "none",
+      borderRadius: 10,
+      fontSize: 14,
+      fontWeight: 700,
+      cursor: "pointer",
+      fontFamily: "inherit",
+      boxShadow: "0 6px 20px rgba(249,115,22,.3)",
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      gap: 4,
+      minWidth: 140
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 28
+    }
+  }, "\uD83D\uDCCB"), /*#__PURE__*/React.createElement("span", null, "\u30C6\u30F3\u30D7\u30EC\u3067\u59CB\u3081\u308B"), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 10,
+      opacity: .8,
+      fontWeight: 500
+    }
+  }, "4\u3064\u306E\u30D1\u30BF\u30FC\u30F3")), /*#__PURE__*/React.createElement("button", {
+    onClick: function (e) {
+      e.stopPropagation();
+      addItem();
+    },
+    style: {
+      padding: "14px 22px",
+      background: "rgba(255,255,255,.08)",
+      color: "#e4e4e7",
+      border: "1px solid rgba(255,255,255,.2)",
+      borderRadius: 10,
+      fontSize: 14,
+      fontWeight: 700,
+      cursor: "pointer",
+      fontFamily: "inherit",
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      gap: 4,
+      minWidth: 140
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 28
+    }
+  }, "\uFF0B"), /*#__PURE__*/React.createElement("span", null, "\u7A7A\u304B\u3089\u4F5C\u308B"), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 10,
+      opacity: .6,
+      fontWeight: 500
+    }
+  }, "\u30D1\u30FC\u30C4\u30921\u3064\u8FFD\u52A0"))))), showGrid && /*#__PURE__*/React.createElement("div", {
     style: {
       position: "absolute",
       inset: 0,
@@ -5714,6 +5851,10 @@ function App() {
       try {
         localStorage.setItem("mc_welcomed", "true");
       } catch (e) {}
+      ;
+      setTimeout(function () {
+        setShowStarter(true);
+      }, 400);
     },
     style: {
       width: "100%",
@@ -5763,5 +5904,244 @@ function App() {
       marginTop: 4,
       color: "#2a2a2a"
     }
-  }, "\xA9 2026 BESTAD G.K. All Rights Reserved"))))));
+  }, "\xA9 2026 BESTAD G.K. All Rights Reserved"))))), showStarter && /*#__PURE__*/React.createElement("div", {
+    style: {
+      position: "fixed",
+      inset: 0,
+      zIndex: 9999,
+      background: "rgba(10,14,23,.85)",
+      backdropFilter: "blur(8px)",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      padding: 20
+    },
+    onClick: function () {
+      setShowStarter(false);
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    onClick: function (e) {
+      e.stopPropagation();
+    },
+    style: {
+      background: "linear-gradient(180deg,#161b26,#0d1117)",
+      borderRadius: 20,
+      padding: "36px 28px",
+      maxWidth: 520,
+      width: "100%",
+      border: "1px solid #2a3040",
+      boxShadow: "0 20px 60px rgba(0,0,0,.6)",
+      position: "relative"
+    }
+  }, /*#__PURE__*/React.createElement("button", {
+    onClick: function () {
+      setShowStarter(false);
+    },
+    style: {
+      position: "absolute",
+      top: 14,
+      right: 14,
+      width: 32,
+      height: 32,
+      borderRadius: "50%",
+      background: "rgba(255,255,255,.06)",
+      border: "1px solid rgba(255,255,255,.1)",
+      color: "#888",
+      fontSize: 16,
+      cursor: "pointer",
+      fontFamily: "inherit"
+    }
+  }, "\xD7"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      textAlign: "center",
+      marginBottom: 24
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 38,
+      marginBottom: 10
+    }
+  }, "\uD83D\uDE80"), /*#__PURE__*/React.createElement("h2", {
+    style: {
+      fontSize: 22,
+      fontWeight: 900,
+      color: "#fff",
+      marginBottom: 8
+    }
+  }, "\u3069\u3053\u304B\u3089\u59CB\u3081\u307E\u3059\u304B\uFF1F"), /*#__PURE__*/React.createElement("p", {
+    style: {
+      fontSize: 13,
+      color: "#94a3b8"
+    }
+  }, "\u8FF7\u3063\u305F\u3089\u300CAI\u753B\u50CF\u3092\u4F5C\u308B\u300D\u304B\u3089\u3002LP\u306E\u30B9\u30AF\u30B7\u30E71\u679A\u3067\u81EA\u52D5\u751F\u6210\u3067\u304D\u307E\u3059\u3002")), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      flexDirection: "column",
+      gap: 10
+    }
+  }, /*#__PURE__*/React.createElement("button", {
+    onClick: function () {
+      setShowStarter(false);
+      setShowMCTool(true);
+    },
+    style: {
+      padding: "16px 20px",
+      background: "linear-gradient(135deg,#35C9A0,#0F6E56)",
+      color: "#fff",
+      border: "none",
+      borderRadius: 12,
+      fontSize: 14,
+      fontWeight: 700,
+      cursor: "pointer",
+      fontFamily: "inherit",
+      textAlign: "left",
+      display: "flex",
+      alignItems: "center",
+      gap: 14,
+      boxShadow: "0 4px 16px rgba(53,201,160,.25)"
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 32
+    }
+  }, "\uD83C\uDFA8"), /*#__PURE__*/React.createElement("span", {
+    style: {
+      flex: 1
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      display: "block",
+      fontSize: 15,
+      fontWeight: 800
+    }
+  }, "AI\u753B\u50CF\u3092\u4F5C\u308B"), /*#__PURE__*/React.createElement("span", {
+    style: {
+      display: "block",
+      fontSize: 11,
+      opacity: .85,
+      fontWeight: 500,
+      marginTop: 2
+    }
+  }, "LP\u306E\u30B9\u30AF\u30B7\u30E7 \u2192 Canva AI\u30674\u30B5\u30A4\u30BA\u81EA\u52D5\u751F\u6210")), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 18
+    }
+  }, "\u2192")), /*#__PURE__*/React.createElement("button", {
+    onClick: function () {
+      setShowStarter(false);
+      applyTemplate("stack3");
+    },
+    style: {
+      padding: "16px 20px",
+      background: "linear-gradient(135deg,#f97316,#ea580c)",
+      color: "#fff",
+      border: "none",
+      borderRadius: 12,
+      fontSize: 14,
+      fontWeight: 700,
+      cursor: "pointer",
+      fontFamily: "inherit",
+      textAlign: "left",
+      display: "flex",
+      alignItems: "center",
+      gap: 14,
+      boxShadow: "0 4px 16px rgba(249,115,22,.25)"
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 32
+    }
+  }, "\uD83D\uDCE6"), /*#__PURE__*/React.createElement("span", {
+    style: {
+      flex: 1
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      display: "block",
+      fontSize: 15,
+      fontWeight: 800
+    }
+  }, "Stack 3\u70B9\u30C6\u30F3\u30D7\u30EC\u3067\u59CB\u3081\u308B"), /*#__PURE__*/React.createElement("span", {
+    style: {
+      display: "block",
+      fontSize: 11,
+      opacity: .85,
+      fontWeight: 500,
+      marginTop: 2
+    }
+  }, "iMac\uFF0BiPad\uFF0BiPhone\u306E\u738B\u9053\u30EC\u30A4\u30A2\u30A6\u30C8")), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 18
+    }
+  }, "\u2192")), /*#__PURE__*/React.createElement("button", {
+    onClick: function () {
+      setShowStarter(false);
+      applyTemplate("stack5");
+    },
+    style: {
+      padding: "16px 20px",
+      background: "linear-gradient(135deg,#6366f1,#4f46e5)",
+      color: "#fff",
+      border: "none",
+      borderRadius: 12,
+      fontSize: 14,
+      fontWeight: 700,
+      cursor: "pointer",
+      fontFamily: "inherit",
+      textAlign: "left",
+      display: "flex",
+      alignItems: "center",
+      gap: 14,
+      boxShadow: "0 4px 16px rgba(99,102,241,.25)"
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 32
+    }
+  }, "\uD83C\uDF81"), /*#__PURE__*/React.createElement("span", {
+    style: {
+      flex: 1
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      display: "block",
+      fontSize: 15,
+      fontWeight: 800
+    }
+  }, "\u30D5\u30EB\u30BB\u30C3\u30C8 5\u70B9\u3067\u59CB\u3081\u308B"), /*#__PURE__*/React.createElement("span", {
+    style: {
+      display: "block",
+      fontSize: 11,
+      opacity: .85,
+      fontWeight: 500,
+      marginTop: 2
+    }
+  }, "\u8C6A\u83EF\u30AA\u30D5\u30A1\u30FC\u5411\u3051\u30FB\u4FA1\u5024\u306E\u7A4D\u307F\u4E0A\u3052\u8868\u73FE")), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 18
+    }
+  }, "\u2192")), /*#__PURE__*/React.createElement("button", {
+    onClick: function () {
+      setShowStarter(false);
+    },
+    style: {
+      padding: "12px 20px",
+      background: "none",
+      color: "#888",
+      border: "1px solid #2a3040",
+      borderRadius: 12,
+      fontSize: 13,
+      fontWeight: 600,
+      cursor: "pointer",
+      fontFamily: "inherit",
+      marginTop: 6
+    }
+  }, "\u81EA\u5206\u3067\u81EA\u7531\u306B\u4F5C\u308B\uFF08\u7A7A\u304B\u3089\uFF09")), /*#__PURE__*/React.createElement("div", {
+    style: {
+      textAlign: "center",
+      marginTop: 18,
+      fontSize: 11,
+      color: "#555"
+    }
+  }, "\u3042\u3068\u3067\u3044\u3064\u3067\u3082\u5909\u66F4\u3067\u304D\u307E\u3059"))));
 }
