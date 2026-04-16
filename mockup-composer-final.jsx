@@ -1955,6 +1955,11 @@ export default function App() {
             </div>;})}
           </div>
 
+          {/* DEMO IMAGE */}
+          <div style={{ textAlign: "center", marginBottom: 32 }}>
+            <img src={FRAME_BASE+"splash-demo.png"} style={{ width: "100%", maxWidth: 480, borderRadius: 12 }} alt="完成例" />
+          </div>
+
           {/* CTA */}
           <div style={{ textAlign: "center", paddingBottom: 60 }}>
             <button onClick={function(){setShowWelcome(false);try{localStorage.setItem("mc_welcomed","true");}catch(e){}}} style={{

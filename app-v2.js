@@ -5642,6 +5642,19 @@ function App() {
   })), /*#__PURE__*/React.createElement("div", {
     style: {
       textAlign: "center",
+      marginBottom: 32
+    }
+  }, /*#__PURE__*/React.createElement("img", {
+    src: FRAME_BASE + "splash-demo.png",
+    style: {
+      width: "100%",
+      maxWidth: 480,
+      borderRadius: 12
+    },
+    alt: "\u5B8C\u6210\u4F8B"
+  })), /*#__PURE__*/React.createElement("div", {
+    style: {
+      textAlign: "center",
       paddingBottom: 60
     }
   }, /*#__PURE__*/React.createElement("button", {
