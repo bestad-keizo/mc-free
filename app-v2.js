@@ -510,7 +510,8 @@ function ItemRender({
       position: "relative",
       width: d.frameW,
       height: d.frameH,
-      overflow: "hidden"
+      overflow: "hidden",
+      transform: "translateZ(0)"
     }
   }, d.frameUrl && /*#__PURE__*/React.createElement("img", {
     src: d.frameUrl,
@@ -4161,6 +4162,8 @@ function App() {
       };
       const canvas = await window.html2canvas(el, {
         scale: dpiScale[exportDpi] || 1.33,
+        width: 1200,
+        height: 800,
         backgroundColor: exportFmt === "png" ? null : "#ffffff",
         useCORS: true,
         allowTaint: true,
@@ -4990,7 +4993,7 @@ function App() {
       position: "relative",
       width: 1200,
       height: 800,
-      overflow: "visible"
+      overflow: "hidden"
     }
   }, items.map((it, idx) => /*#__PURE__*/React.createElement(Draggable, {
     key: it.id,

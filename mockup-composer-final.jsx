@@ -195,7 +195,7 @@ function ItemRender({ item: d }) {
   const spineTransform = (d.spineSkewX || d.spineSkewY || d.spineRotateY) ? `skewX(${d.spineSkewX||0}deg) skewY(${d.spineSkewY||0}deg) perspective(500px) rotateY(${d.spineRotateY||0}deg)` : "none";
 
   return (
-    <div style={{ position: "relative", width: d.frameW, height: d.frameH, overflow: "hidden" }}>
+    <div style={{ position: "relative", width: d.frameW, height: d.frameH, overflow: "hidden", transform: "translateZ(0)" }}>
       {/* Layer 1: Frame image (BEHIND content) */}
       {d.frameUrl && <img src={d.frameUrl} style={{
         position: "absolute", top: 0, left: 0, width: d.frameW, height: d.frameH,
@@ -1641,6 +1641,8 @@ export default function App() {
       const dpiScale = { 72: 1, 96: 1.33, 300: 4.17 };
       const canvas = await window.html2canvas(el, {
         scale: dpiScale[exportDpi] || 1.33,
+        width: 1200,
+        height: 800,
         backgroundColor: exportFmt === "png" ? null : "#ffffff",
         useCORS: true,
         allowTaint: true,
@@ -1809,7 +1811,7 @@ export default function App() {
         <div style={{ padding: 12, overflow: "auto", display: "flex", alignItems: "flex-start", justifyContent: "center" }} onClick={() => { setSelected(null); setShowExport(false); }}>
           <div style={{ transform: `scale(${cScale})`, transformOrigin: "top center", position: "relative" }}>
             <div style={{ position: "absolute", inset: 0, width: 1200, height: 800, borderRadius: 8, overflow: "hidden", ...wsBgStyle }} />
-            <div ref={canvasRef} style={{ position: "relative", width: 1200, height: 800, overflow: "visible" }}>
+            <div ref={canvasRef} style={{ position: "relative", width: 1200, height: 800, overflow: "hidden" }}>
               {items.map((it, idx) => (<Draggable key={it.id} item={{...it, zIndex: idx + 1}} onUpdate={updateItem} selected={selected === it.id} onSelect={setSelected} cScale={cScale} snap={showGrid} />))}
             </div>
             {showGrid && <div style={{ position: "absolute", inset: 0, width: 1200, height: 800, pointerEvents: "none", zIndex: 9000 }}>
