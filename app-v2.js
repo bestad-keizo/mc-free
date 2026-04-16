@@ -2,7 +2,8 @@ const {
   useState,
   useRef,
   useCallback,
-  useEffect
+  useEffect,
+  memo
 } = React;
 
 // ===== FREE/PRO MODE FLAG =====
@@ -497,7 +498,7 @@ function imgLoad(file, cb) {
 }
 
 // ===== ITEM RENDER =====
-function ItemRender({
+const ItemRender = memo(function ItemRender({
   item: d
 }) {
   const hasImg = !!d.contentImage;
@@ -640,7 +641,7 @@ function ItemRender({
       alt: ""
     }));
   })());
-}
+});
 
 // ===== SCREEN AREA EDITOR =====
 function ScreenAreaEditor({
@@ -3617,6 +3618,7 @@ function App() {
 
   // ===== AUTO-SAVE: 起動時に復元 =====
   const hasRestoredRef = useRef(false);
+  const [autoSaveStatus, setAutoSaveStatus] = useState("ok"); // "ok" | "lite" | "failed"
   useEffect(function () {
     if (hasRestoredRef.current) return;
     hasRestoredRef.current = true;
@@ -3627,6 +3629,9 @@ function App() {
         if (parsed && Array.isArray(parsed.items) && parsed.items.length > 0) {
           skipHistory.current = true;
           setItems(parsed.items);
+          if (parsed.lite) {
+            setAutoSaveStatus("lite");
+          }
         }
       }
     } catch (e) {
@@ -3640,6 +3645,7 @@ function App() {
     if (!hasRestoredRef.current) return; // 復元完了前は保存しない
     if (autoSaveTimerRef.current) clearTimeout(autoSaveTimerRef.current);
     autoSaveTimerRef.current = setTimeout(function () {
+      // まずフル保存を試行
       try {
         var payload = {
           version: 1,
@@ -3647,8 +3653,31 @@ function App() {
           items: items
         };
         localStorage.setItem("mc_autosave", JSON.stringify(payload));
+        setAutoSaveStatus("ok");
+        return;
       } catch (e) {
-        console.warn("autosave failed", e);
+        console.warn("autosave full failed, trying lite mode", e);
+      }
+      // 容量オーバー：画像を除いた軽量版で再試行
+      try {
+        var liteItems = items.map(function (it) {
+          return Object.assign({}, it, {
+            contentImage: null,
+            spineImage: null,
+            frameUrl: it.frameUrl && it.frameUrl.indexOf("data:") === 0 ? null : it.frameUrl
+          });
+        });
+        var litePayload = {
+          version: 1,
+          savedAt: Date.now(),
+          items: liteItems,
+          lite: true
+        };
+        localStorage.setItem("mc_autosave", JSON.stringify(litePayload));
+        setAutoSaveStatus("lite");
+      } catch (e2) {
+        console.warn("autosave lite also failed", e2);
+        setAutoSaveStatus("failed");
       }
     }, 500);
     return function () {
@@ -4089,12 +4118,11 @@ function App() {
     setItems(prev => {
       const s = prev.find(it => it.id === id);
       if (!s) return prev;
-      return [...prev, {
-        ...s,
-        id: uid(),
-        x: s.x + 20,
-        y: s.y + 20
-      }];
+      var copy = JSON.parse(JSON.stringify(s));
+      copy.id = uid();
+      copy.x = s.x + 20;
+      copy.y = s.y + 20;
+      return [...prev, copy];
     });
   }, []);
   const addItem = useCallback(() => {
@@ -4292,7 +4320,9 @@ function App() {
         finalCanvas.height = canvas.height;
         var wCtx = finalCanvas.getContext("2d");
         wCtx.drawImage(canvas, 0, 0);
-        var wFontSize = Math.max(10, Math.round(finalCanvas.width * 0.012));
+        // ウォーターマークサイズは元画像1200px基準で計算（DPIスケールに応じて補正）
+        var dpiMul = dpiScale[exportDpi] || 1.33;
+        var wFontSize = Math.max(10, Math.round(1200 * 0.012 * dpiMul));
         var wText = "MC";
         wCtx.font = "bold " + wFontSize + "px Arial, Helvetica, sans-serif";
         var wPad = wFontSize * 0.6;
@@ -4535,7 +4565,7 @@ function App() {
       padding: "8px 12px",
       borderBottom: "1px solid #2a3040"
     }
-  }, "\u30D7\u30ED\u30B8\u30A7\u30AF\u30C8\u7BA1\u7406"), /*#__PURE__*/React.createElement("div", {
+  }, "\u30D7\u30ED\u30B8\u30A7\u30AF\u30C8\u7BA1\u7406"), autoSaveStatus === "ok" && /*#__PURE__*/React.createElement("div", {
     style: {
       padding: "10px 12px",
       fontSize: 10,
@@ -4551,7 +4581,67 @@ function App() {
     style: {
       fontSize: 12
     }
-  }, "\u2713"), /*#__PURE__*/React.createElement("span", null, "\u4F5C\u696D\u5185\u5BB9\u306F\u81EA\u52D5\u4FDD\u5B58\u3055\u308C\u3066\u3044\u307E\u3059")), /*#__PURE__*/React.createElement("button", {
+  }, "\u2713"), /*#__PURE__*/React.createElement("span", null, "\u4F5C\u696D\u5185\u5BB9\u306F\u81EA\u52D5\u4FDD\u5B58\u3055\u308C\u3066\u3044\u307E\u3059")), autoSaveStatus === "lite" && /*#__PURE__*/React.createElement("div", {
+    style: {
+      padding: "10px 12px",
+      fontSize: 10,
+      color: "#fbbf24",
+      background: "rgba(251,191,36,.08)",
+      borderRadius: 6,
+      margin: 4
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      alignItems: "center",
+      gap: 6,
+      marginBottom: 3
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 12
+    }
+  }, "\u26A0"), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontWeight: 700
+    }
+  }, "\u8EFD\u91CF\u30E2\u30FC\u30C9\u3067\u4FDD\u5B58\u4E2D")), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 9,
+      color: "#d4a017",
+      lineHeight: 1.5
+    }
+  }, "\u5BB9\u91CF\u30AA\u30FC\u30D0\u30FC\u306E\u305F\u3081\u753B\u50CF\u306F\u4FDD\u5B58\u3055\u308C\u307E\u305B\u3093\u3002\u66F8\u304D\u51FA\u3057\u3092\u304A\u3059\u3059\u3081\u3057\u307E\u3059\u3002")), autoSaveStatus === "failed" && /*#__PURE__*/React.createElement("div", {
+    style: {
+      padding: "10px 12px",
+      fontSize: 10,
+      color: "#ef4444",
+      background: "rgba(239,68,68,.08)",
+      borderRadius: 6,
+      margin: 4
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      alignItems: "center",
+      gap: 6,
+      marginBottom: 3
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 12
+    }
+  }, "\u2717"), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontWeight: 700
+    }
+  }, "\u81EA\u52D5\u4FDD\u5B58\u306B\u5931\u6557")), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 9,
+      color: "#dc2626",
+      lineHeight: 1.5
+    }
+  }, "\u30D6\u30E9\u30A6\u30B6\u306E\u5BB9\u91CF\u304C\u4E0D\u8DB3\u3057\u3066\u3044\u307E\u3059\u3002\u66F8\u304D\u51FA\u3057\u3067\u4FDD\u5B58\u3057\u3066\u304F\u3060\u3055\u3044\u3002")), /*#__PURE__*/React.createElement("button", {
     onClick: exportProject,
     style: {
       display: "block",
@@ -6051,11 +6141,22 @@ function App() {
     ref: function (el) {
       if (!el || el.dataset.loaded) return;
       el.dataset.loaded = "1";
+      // 10秒後にiframeが生成されていなければフォールバック表示
+      setTimeout(function () {
+        if (el && !el.querySelector("iframe")) {
+          el.innerHTML = '<div style="width:100%;aspect-ratio:1.73611/1;background:#0a0e17;border:1px solid #2a3040;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;text-align:center;"><div style="font-size:40px;margin-bottom:12px;">🎬</div><div style="font-size:14px;color:#fff;font-weight:700;margin-bottom:8px;">デモ動画</div><div style="font-size:12px;color:#94a3b8;line-height:1.6;">広告ブロッカーをオフにすると動画が表示されます<br/>または下のボタンから直接ツールを開始できます</div></div>';
+        }
+      }, 10000);
       // Voomlyスクリプトをロード
       if (!document.querySelector('script[src*="voomly"]')) {
         var s = document.createElement("script");
         s.src = "https://embed.voomly.softwarepublishingapp.com/embed/embed-build.js";
         s.async = true;
+        s.onerror = function () {
+          if (el) {
+            el.innerHTML = '<div style="width:100%;aspect-ratio:1.73611/1;background:#0a0e17;border:1px solid #2a3040;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;text-align:center;"><div style="font-size:40px;margin-bottom:12px;">🎬</div><div style="font-size:14px;color:#fff;font-weight:700;margin-bottom:8px;">デモ動画を読み込めませんでした</div><div style="font-size:12px;color:#94a3b8;line-height:1.6;">広告ブロッカーをオフにしてページを再読み込みしてください<br/>または下のボタンから直接ツールを開始できます</div></div>';
+          }
+        };
         document.head.appendChild(s);
       }
     },

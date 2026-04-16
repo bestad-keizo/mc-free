@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useRef, useCallback, useEffect, memo } from "react";
 
 // ===== FREE/PRO MODE FLAG =====
 // JSX版(Pro): false | HTML配布版(Free): true (変換時に自動切替)
@@ -187,7 +187,7 @@ function imgLoad(file, cb) {
 }
 
 // ===== ITEM RENDER =====
-function ItemRender({ item: d }) {
+const ItemRender = memo(function ItemRender({ item: d }) {
   const hasImg = !!d.contentImage;
   const hasSpine = !!d.spineImage && d.spineW > 0 && d.spineH > 0;
   const bg = hasImg ? "transparent" : d.contentType === "color" ? d.bgColor : d.contentType === "gradient" ? d.bgGradient : "transparent";
@@ -251,7 +251,7 @@ function ItemRender({ item: d }) {
       })()}
     </div>
   );
-}
+});
 
 // ===== SCREEN AREA EDITOR =====
 function ScreenAreaEditor({ item, onUpdate }) {
@@ -1248,6 +1248,7 @@ export default function App() {
 
   // ===== AUTO-SAVE: 起動時に復元 =====
   const hasRestoredRef = useRef(false);
+  const [autoSaveStatus, setAutoSaveStatus] = useState("ok"); // "ok" | "lite" | "failed"
   useEffect(function(){
     if(hasRestoredRef.current) return;
     hasRestoredRef.current = true;
@@ -1258,6 +1259,7 @@ export default function App() {
         if(parsed && Array.isArray(parsed.items) && parsed.items.length > 0){
           skipHistory.current = true;
           setItems(parsed.items);
+          if(parsed.lite){ setAutoSaveStatus("lite"); }
         }
       }
     }catch(e){ console.warn("autosave restore failed", e); }
@@ -1269,10 +1271,31 @@ export default function App() {
     if(!hasRestoredRef.current) return; // 復元完了前は保存しない
     if(autoSaveTimerRef.current) clearTimeout(autoSaveTimerRef.current);
     autoSaveTimerRef.current = setTimeout(function(){
+      // まずフル保存を試行
       try{
         var payload = { version: 1, savedAt: Date.now(), items: items };
         localStorage.setItem("mc_autosave", JSON.stringify(payload));
-      }catch(e){ console.warn("autosave failed", e); }
+        setAutoSaveStatus("ok");
+        return;
+      }catch(e){
+        console.warn("autosave full failed, trying lite mode", e);
+      }
+      // 容量オーバー：画像を除いた軽量版で再試行
+      try{
+        var liteItems = items.map(function(it){
+          return Object.assign({}, it, {
+            contentImage: null,
+            spineImage: null,
+            frameUrl: it.frameUrl && it.frameUrl.indexOf("data:") === 0 ? null : it.frameUrl,
+          });
+        });
+        var litePayload = { version: 1, savedAt: Date.now(), items: liteItems, lite: true };
+        localStorage.setItem("mc_autosave", JSON.stringify(litePayload));
+        setAutoSaveStatus("lite");
+      }catch(e2){
+        console.warn("autosave lite also failed", e2);
+        setAutoSaveStatus("failed");
+      }
     }, 500);
     return function(){ if(autoSaveTimerRef.current) clearTimeout(autoSaveTimerRef.current); };
   },[items]);
@@ -1610,7 +1633,7 @@ export default function App() {
 
   const updateItem = useCallback((id, p) => setItems(prev => prev.map(it => it.id === id ? { ...it, ...p } : it)), []);
   const removeItem = useCallback((id) => { setItems(prev => prev.filter(it => it.id !== id)); setSelected(null); }, []);
-  const duplicateItem = useCallback((id) => { setItems(prev => { const s = prev.find(it => it.id === id); if (!s) return prev; return [...prev, { ...s, id: uid(), x: s.x + 20, y: s.y + 20 }]; }); }, []);
+  const duplicateItem = useCallback((id) => { setItems(prev => { const s = prev.find(it => it.id === id); if (!s) return prev; var copy = JSON.parse(JSON.stringify(s)); copy.id = uid(); copy.x = s.x + 20; copy.y = s.y + 20; return [...prev, copy]; }); }, []);
   const addItem = useCallback(() => { const n = createItem(); setItems(prev => [...prev, n]); setSelected(n.id); }, []);
   const applyTemplate = useCallback(function(tpl){
     var getFrame = function(bid){
@@ -1752,7 +1775,9 @@ export default function App() {
         finalCanvas.height = canvas.height;
         var wCtx = finalCanvas.getContext("2d");
         wCtx.drawImage(canvas, 0, 0);
-        var wFontSize = Math.max(10, Math.round(finalCanvas.width * 0.012));
+        // ウォーターマークサイズは元画像1200px基準で計算（DPIスケールに応じて補正）
+        var dpiMul = (dpiScale[exportDpi] || 1.33);
+        var wFontSize = Math.max(10, Math.round(1200 * 0.012 * dpiMul));
         var wText = "MC";
         wCtx.font = "bold " + wFontSize + "px Arial, Helvetica, sans-serif";
         var wPad = wFontSize * 0.6;
@@ -1816,10 +1841,24 @@ export default function App() {
             <button onClick={function(){setShowSave(!showSave);setShowExport(false);setCanvaOpen(false);setCfOpen(false);setShowHelp(false);}} style={{ background: showSave ? "#f97316" : "#161b26", color: showSave ? "#fff" : "#e4e4e7", border: "1px solid #2a3040", borderRadius: 8, padding: "9px 14px", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>📂 保存/読込</button>
             {showSave && <div style={{ position: "absolute", top: "100%", right: 0, marginTop: 8, background: "#161b26", borderRadius: 12, padding: 6, boxShadow: "0 12px 40px rgba(0,0,0,.4)", zIndex: 100, width: 260, border: "1px solid #2a3040" }} onClick={function(e){e.stopPropagation();}}>
               <div style={{ fontSize: 11, fontWeight: 700, color: "#f97316", padding: "8px 12px", borderBottom: "1px solid #2a3040" }}>プロジェクト管理</div>
-              <div style={{ padding: "10px 12px", fontSize: 10, color: "#22c55e", background: "rgba(34,197,94,.08)", borderRadius: 6, margin: 4, display: "flex", alignItems: "center", gap: 6 }}>
+              {autoSaveStatus === "ok" && <div style={{ padding: "10px 12px", fontSize: 10, color: "#22c55e", background: "rgba(34,197,94,.08)", borderRadius: 6, margin: 4, display: "flex", alignItems: "center", gap: 6 }}>
                 <span style={{ fontSize: 12 }}>✓</span>
                 <span>作業内容は自動保存されています</span>
-              </div>
+              </div>}
+              {autoSaveStatus === "lite" && <div style={{ padding: "10px 12px", fontSize: 10, color: "#fbbf24", background: "rgba(251,191,36,.08)", borderRadius: 6, margin: 4 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 3 }}>
+                  <span style={{ fontSize: 12 }}>⚠</span>
+                  <span style={{ fontWeight: 700 }}>軽量モードで保存中</span>
+                </div>
+                <div style={{ fontSize: 9, color: "#d4a017", lineHeight: 1.5 }}>容量オーバーのため画像は保存されません。書き出しをおすすめします。</div>
+              </div>}
+              {autoSaveStatus === "failed" && <div style={{ padding: "10px 12px", fontSize: 10, color: "#ef4444", background: "rgba(239,68,68,.08)", borderRadius: 6, margin: 4 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 3 }}>
+                  <span style={{ fontSize: 12 }}>✗</span>
+                  <span style={{ fontWeight: 700 }}>自動保存に失敗</span>
+                </div>
+                <div style={{ fontSize: 9, color: "#dc2626", lineHeight: 1.5 }}>ブラウザの容量が不足しています。書き出しで保存してください。</div>
+              </div>}
               <button onClick={exportProject} style={{ display: "block", width: "calc(100% - 8px)", margin: "4px", padding: "10px 12px", fontSize: 12, color: "#fff", background: "linear-gradient(135deg,#3b82f6,#1d4ed8)", border: "none", borderRadius: 6, cursor: "pointer", fontFamily: "inherit", fontWeight: 700, textAlign: "left" }}>💾 プロジェクトを書き出す<div style={{ fontSize: 9, opacity: .85, fontWeight: 500, marginTop: 2 }}>JSONファイルとしてダウンロード</div></button>
               <button onClick={function(){ if(importFileRef.current) importFileRef.current.click(); }} style={{ display: "block", width: "calc(100% - 8px)", margin: "4px", padding: "10px 12px", fontSize: 12, color: "#fff", background: "linear-gradient(135deg,#8b5cf6,#6d28d9)", border: "none", borderRadius: 6, cursor: "pointer", fontFamily: "inherit", fontWeight: 700, textAlign: "left" }}>📥 プロジェクトを読み込む<div style={{ fontSize: 9, opacity: .85, fontWeight: 500, marginTop: 2 }}>書き出したJSONファイルを復元</div></button>
               <input ref={importFileRef} type="file" accept="application/json,.json" style={{ display: "none" }} onChange={function(e){ var f = e.target.files && e.target.files[0]; if(f){ importProject(f); e.target.value = ""; } }} />
@@ -2096,11 +2135,20 @@ export default function App() {
             <div ref={function(el){
               if(!el || el.dataset.loaded) return;
               el.dataset.loaded = "1";
+              // 10秒後にiframeが生成されていなければフォールバック表示
+              setTimeout(function(){
+                if(el && !el.querySelector("iframe")){
+                  el.innerHTML = '<div style="width:100%;aspect-ratio:1.73611/1;background:#0a0e17;border:1px solid #2a3040;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;text-align:center;"><div style="font-size:40px;margin-bottom:12px;">🎬</div><div style="font-size:14px;color:#fff;font-weight:700;margin-bottom:8px;">デモ動画</div><div style="font-size:12px;color:#94a3b8;line-height:1.6;">広告ブロッカーをオフにすると動画が表示されます<br/>または下のボタンから直接ツールを開始できます</div></div>';
+                }
+              }, 10000);
               // Voomlyスクリプトをロード
               if(!document.querySelector('script[src*="voomly"]')){
                 var s = document.createElement("script");
                 s.src = "https://embed.voomly.softwarepublishingapp.com/embed/embed-build.js";
                 s.async = true;
+                s.onerror = function(){
+                  if(el){ el.innerHTML = '<div style="width:100%;aspect-ratio:1.73611/1;background:#0a0e17;border:1px solid #2a3040;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;text-align:center;"><div style="font-size:40px;margin-bottom:12px;">🎬</div><div style="font-size:14px;color:#fff;font-weight:700;margin-bottom:8px;">デモ動画を読み込めませんでした</div><div style="font-size:12px;color:#94a3b8;line-height:1.6;">広告ブロッカーをオフにしてページを再読み込みしてください<br/>または下のボタンから直接ツールを開始できます</div></div>'; }
+                };
                 document.head.appendChild(s);
               }
             }} style={{ maxWidth: 480, margin: "0 auto" }}>
