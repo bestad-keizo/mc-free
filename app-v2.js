@@ -5647,15 +5647,36 @@ function App() {
       textAlign: "center",
       marginBottom: 32
     }
-  }, /*#__PURE__*/React.createElement("img", {
-    src: FRAME_BASE + "splash-demo.png",
+  }, /*#__PURE__*/React.createElement("div", {
+    ref: function (el) {
+      if (!el || el.dataset.loaded) return;
+      el.dataset.loaded = "1";
+      // Voomlyスクリプトをロード
+      if (!document.querySelector('script[src*="voomly"]')) {
+        var s = document.createElement("script");
+        s.src = "https://embed.voomly.softwarepublishingapp.com/embed/embed-build.js";
+        s.async = true;
+        document.head.appendChild(s);
+      }
+    },
+    style: {
+      maxWidth: 480,
+      margin: "0 auto"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "voomly-embed",
+    "data-id": "39jQ88GXDwGhDnMUd90clCkzLTwSR9CMIVsjeJECQBLiYQsIi",
+    "data-ratio": "1.777778",
+    "data-type": "v",
+    "data-skin-color": "#FF8F00",
+    "data-shadow": "",
     style: {
       width: "100%",
-      maxWidth: 480,
-      borderRadius: 12
-    },
-    alt: "\u5B8C\u6210\u4F8B"
-  })), /*#__PURE__*/React.createElement("div", {
+      aspectRatio: "1.77778 / 1",
+      background: "linear-gradient(45deg, rgb(142, 150, 164) 0%, rgb(201, 208, 222) 100%)",
+      borderRadius: 10
+    }
+  }))), /*#__PURE__*/React.createElement("div", {
     style: {
       textAlign: "center",
       paddingBottom: 60
