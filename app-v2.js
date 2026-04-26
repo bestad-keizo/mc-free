@@ -4312,35 +4312,7 @@ function App() {
         logging: false
       });
       const mime = exportFmt === "png" ? "image/png" : exportFmt === "jpeg" ? "image/jpeg" : "image/webp";
-      // ウォーターマーク追加（シェア済みでない場合）
       var finalCanvas = canvas;
-      if (!shared) {
-        finalCanvas = document.createElement("canvas");
-        finalCanvas.width = canvas.width;
-        finalCanvas.height = canvas.height;
-        var wCtx = finalCanvas.getContext("2d");
-        wCtx.drawImage(canvas, 0, 0);
-        // ウォーターマークサイズは元画像1200px基準で計算（DPIスケールに応じて補正）
-        var dpiMul = dpiScale[exportDpi] || 1.33;
-        var wFontSize = Math.max(10, Math.round(1200 * 0.012 * dpiMul));
-        var wText = "MC";
-        wCtx.font = "bold " + wFontSize + "px Arial, Helvetica, sans-serif";
-        var wPad = wFontSize * 0.6;
-        var wMeasure = wCtx.measureText(wText);
-        var wBoxW = wMeasure.width + wPad * 2;
-        var wBoxH = wFontSize + wPad * 1.4;
-        var wX = finalCanvas.width - wBoxW - 8;
-        var wY = finalCanvas.height - wBoxH - 8;
-        wCtx.globalAlpha = 0.35;
-        wCtx.fillStyle = "#000";
-        wCtx.fillRect(wX, wY, wBoxW, wBoxH);
-        wCtx.globalAlpha = 0.7;
-        wCtx.fillStyle = "#fff";
-        wCtx.textAlign = "center";
-        wCtx.textBaseline = "middle";
-        wCtx.fillText(wText, wX + wBoxW / 2, wY + wBoxH / 2);
-        wCtx.globalAlpha = 1;
-      }
       const link = document.createElement("a");
       link.download = `mockup-${exportDpi}dpi.${exportFmt === "jpeg" ? "jpg" : exportFmt}`;
       link.href = finalCanvas.toDataURL(mime, exportFmt === "png" ? undefined : 0.95);
@@ -5838,17 +5810,17 @@ function App() {
       color: "#f97316",
       marginBottom: 8
     }
-  }, "\uD83D\uDCA1 \u30A6\u30A9\u30FC\u30BF\u30FC\u30DE\u30FC\u30AF\u3092\u6D88\u3059\u65B9\u6CD5"), /*#__PURE__*/React.createElement("div", {
+  }, "\uD83D\uDCA1 \u3082\u3057\u6C17\u306B\u5165\u3063\u3066\u3044\u305F\u3060\u3051\u305F\u3089"), /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 12,
       color: "#a0a8b8",
       lineHeight: 1.8
     }
-  }, "\u73FE\u5728\u3001\u66F8\u304D\u51FA\u3057\u753B\u50CF\u306B\u900F\u304B\u3057\u304C\u5165\u3063\u3066\u3044\u307E\u3059\u3002", /*#__PURE__*/React.createElement("br", null), "SNS\u3067\u30B7\u30A7\u30A2\u3059\u308B\u3068", /*#__PURE__*/React.createElement("strong", {
+  }, "\u3053\u306E\u30C4\u30FC\u30EB\u306F\u5B8C\u5168\u7121\u6599\u3067\u3059\u3002", /*#__PURE__*/React.createElement("br", null), "\u3082\u3057\u6C17\u306B\u5165\u3063\u3066\u3044\u305F\u3060\u3051\u305F\u3089\u3001", /*#__PURE__*/React.createElement("strong", {
     style: {
       color: "#fff"
     }
-  }, "\u900F\u304B\u3057\u304C\u6D88\u3048\u3066\u3001\u5B8C\u5168\u306B\u30AF\u30EA\u30FC\u30F3\u306A\u753B\u50CF"), "\u3092\u66F8\u304D\u51FA\u305B\u308B\u3088\u3046\u306B\u306A\u308A\u307E\u3059\u3002")), /*#__PURE__*/React.createElement("div", {
+  }, "SNS\u3067\u30B7\u30A7\u30A2\u3057\u3066\u3001\u540C\u3058\u60A9\u307F\u3092\u6301\u3064\u4EF2\u9593\u306B\u6559\u3048\u3066\u3042\u3052\u3066\u304F\u3060\u3055\u3044\u3002"))), /*#__PURE__*/React.createElement("div", {
     style: {
       display: "flex",
       flexDirection: "column",
@@ -5933,7 +5905,7 @@ function App() {
       fontFamily: "inherit",
       textDecoration: "underline"
     }
-  }, "\u3042\u3068\u3067\u30B7\u30A7\u30A2\u3059\u308B\uFF08\u900F\u304B\u3057\u4ED8\u304D\u3067\u4F7F\u3046\uFF09"), /*#__PURE__*/React.createElement("div", {
+  }, "\u3042\u3068\u3067\u30B7\u30A7\u30A2\u3059\u308B"), /*#__PURE__*/React.createElement("div", {
     style: {
       marginTop: 16,
       paddingTop: 12,

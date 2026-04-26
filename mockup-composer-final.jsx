@@ -1767,35 +1767,7 @@ export default function App() {
         logging: false,
       });
       const mime = exportFmt === "png" ? "image/png" : exportFmt === "jpeg" ? "image/jpeg" : "image/webp";
-      // ウォーターマーク追加（シェア済みでない場合）
       var finalCanvas = canvas;
-      if (!shared) {
-        finalCanvas = document.createElement("canvas");
-        finalCanvas.width = canvas.width;
-        finalCanvas.height = canvas.height;
-        var wCtx = finalCanvas.getContext("2d");
-        wCtx.drawImage(canvas, 0, 0);
-        // ウォーターマークサイズは元画像1200px基準で計算（DPIスケールに応じて補正）
-        var dpiMul = (dpiScale[exportDpi] || 1.33);
-        var wFontSize = Math.max(10, Math.round(1200 * 0.012 * dpiMul));
-        var wText = "MC";
-        wCtx.font = "bold " + wFontSize + "px Arial, Helvetica, sans-serif";
-        var wPad = wFontSize * 0.6;
-        var wMeasure = wCtx.measureText(wText);
-        var wBoxW = wMeasure.width + wPad * 2;
-        var wBoxH = wFontSize + wPad * 1.4;
-        var wX = finalCanvas.width - wBoxW - 8;
-        var wY = finalCanvas.height - wBoxH - 8;
-        wCtx.globalAlpha = 0.35;
-        wCtx.fillStyle = "#000";
-        wCtx.fillRect(wX, wY, wBoxW, wBoxH);
-        wCtx.globalAlpha = 0.7;
-        wCtx.fillStyle = "#fff";
-        wCtx.textAlign = "center";
-        wCtx.textBaseline = "middle";
-        wCtx.fillText(wText, wX + wBoxW / 2, wY + wBoxH / 2);
-        wCtx.globalAlpha = 1;
-      }
       const link = document.createElement("a");
       link.download = `mockup-${exportDpi}dpi.${exportFmt === "jpeg" ? "jpg" : exportFmt}`;
       link.href = finalCanvas.toDataURL(mime, exportFmt === "png" ? undefined : 0.95);
@@ -2066,15 +2038,15 @@ export default function App() {
               <div style={{ fontSize: 13, color: "#a0a8b8", lineHeight: 1.8 }}>Exportが無制限になりました</div>
             </div>
             <div style={{ background: "rgba(249,115,22,.06)", borderRadius: 12, padding: "16px 18px", marginBottom: 20, border: "1px solid rgba(249,115,22,.15)" }}>
-              <div style={{ fontSize: 13, fontWeight: 700, color: "#f97316", marginBottom: 8 }}>💡 ウォーターマークを消す方法</div>
-              <div style={{ fontSize: 12, color: "#a0a8b8", lineHeight: 1.8 }}>現在、書き出し画像に透かしが入っています。<br/>SNSでシェアすると<strong style={{ color: "#fff" }}>透かしが消えて、完全にクリーンな画像</strong>を書き出せるようになります。</div>
+              <div style={{ fontSize: 13, fontWeight: 700, color: "#f97316", marginBottom: 8 }}>💡 もし気に入っていただけたら</div>
+              <div style={{ fontSize: 12, color: "#a0a8b8", lineHeight: 1.8 }}>このツールは完全無料です。<br/>もし気に入っていただけたら、<strong style={{ color: "#fff" }}>SNSでシェアして、同じ悩みを持つ仲間に教えてあげてください。</strong></div>
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 16 }}>
               <button onClick={function(){ window.open("https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent("https://www.funnelbuilding.club/mc-free"), "_blank", "width=600,height=400"); setShared(true); try{localStorage.setItem("mc_shared","true");}catch(e){} setShowShareModal(false); }} style={{ width: "100%", padding: "13px 0", background: "#1877F2", color: "#fff", border: "none", borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>📘 Facebookでシェア</button>
               <button onClick={function(){ window.open("https://twitter.com/intent/tweet?text=" + encodeURIComponent("無料でプロ品質の3Dモックアップが作れるツールを見つけた！コーチ・コンサル・セラピストにおすすめ 👉 https://www.funnelbuilding.club/mc-free"), "_blank", "width=600,height=400"); setShared(true); try{localStorage.setItem("mc_shared","true");}catch(e){} setShowShareModal(false); }} style={{ width: "100%", padding: "13px 0", background: "#000", color: "#fff", border: "1px solid #333", borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>𝕏 でシェア</button>
               <button onClick={function(){ window.open("https://line.me/R/share?text=" + encodeURIComponent("無料でプロ品質の3Dモックアップが作れるツールを見つけた！\nhttps://www.funnelbuilding.club/mc-free"), "_blank", "width=600,height=400"); setShared(true); try{localStorage.setItem("mc_shared","true");}catch(e){} setShowShareModal(false); }} style={{ width: "100%", padding: "13px 0", background: "#06C755", color: "#fff", border: "none", borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>💬 LINEで送る</button>
             </div>
-            <button onClick={function(){ setShowShareModal(false); }} style={{ display: "block", margin: "0 auto", background: "none", border: "none", color: "#444", fontSize: 11, cursor: "pointer", fontFamily: "inherit", textDecoration: "underline" }}>あとでシェアする（透かし付きで使う）</button>
+            <button onClick={function(){ setShowShareModal(false); }} style={{ display: "block", margin: "0 auto", background: "none", border: "none", color: "#444", fontSize: 11, cursor: "pointer", fontFamily: "inherit", textDecoration: "underline" }}>あとでシェアする</button>
             <div style={{ marginTop: 16, paddingTop: 12, borderTop: "1px solid rgba(255,255,255,.06)", textAlign: "center", fontSize: 9, color: "#333", lineHeight: 2 }}>
               <div>BESTAD G.K.</div>
               <a href="https://bestad.biz/tokushou.html" target="_blank" rel="noopener noreferrer" style={{ color: "#444", textDecoration: "none" }}>特定商取引法に基づく表記</a> ｜ <a href="https://bestad.biz/privacypolicy.html" target="_blank" rel="noopener noreferrer" style={{ color: "#444", textDecoration: "none" }}>プライバシーポリシー</a>
